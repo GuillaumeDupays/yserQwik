@@ -1,0 +1,72 @@
+{
+    "data": [
+        {
+            "id": 1,
+            "attributes": {
+                "title": "Substantia flower",
+                "description": "### Incroyable fleur d'une planète lointaine\n\nFleur de type fleur",
+                "date": "2023-07-27",
+                "style": "floral",
+                "createdAt": "2023-07-27T12:35:09.412Z",
+                "updatedAt": "2023-07-27T12:35:14.148Z",
+                "publishedAt": "2023-07-27T12:35:14.144Z"
+            }
+        },
+        {
+            "id": 2,
+            "attributes": {
+                "title": "Picapak",
+                "description": "Picapak flower\n\nCe qui est génial avec cette flower c'est qu'elle est belle.\n",
+                "date": "2023-07-27",
+                "style": "floral",
+                "createdAt": "2023-07-27T12:42:01.374Z",
+                "updatedAt": "2023-07-27T12:42:03.364Z",
+                "publishedAt": "2023-07-27T12:42:03.362Z"
+            }
+        },
+        {
+            "id": 3,
+            "attributes": {
+                "title": "Créature humanoisante",
+                "description": "Humano\n\nCe n'est pas un humain, c'est un animal qui y ressemble.",
+                "date": "2023-07-27",
+                "style": "personnage imaginaire",
+                "createdAt": "2023-07-27T12:44:31.055Z",
+                "updatedAt": "2023-07-27T12:44:33.427Z",
+                "publishedAt": "2023-07-27T12:44:33.425Z"
+            }
+        },
+              {
+            "id": 4,
+            "attributes": {
+                "title": "Créature humanoisante",
+                "description": "Humano\n\nCe n'est pas un humain, c'est un animal qui y ressemble.",
+                "date": "2023-07-27",
+                "style": "pierre",
+                "createdAt": "2023-07-27T12:44:31.055Z",
+                "updatedAt": "2023-07-27T12:44:33.427Z",
+                "publishedAt": "2023-07-27T12:44:33.425Z"
+            }
+        },
+              {
+            "id": 5,
+            "attributes": {
+                "title": "Créature humanoisante",
+                "description": "Humano\n\nCe n'est pas un humain, c'est un animal qui y ressemble.",
+                "date": "2023-07-27",
+                "style": "pierre",
+                "createdAt": "2023-07-27T12:44:31.055Z",
+                "updatedAt": "2023-07-27T12:44:33.427Z",
+                "publishedAt": "2023-07-27T12:44:33.425Z"
+            }
+        }
+    ],
+    "meta": {
+        "pagination": {
+            "page": 1,
+            "pageSize": 25,
+            "pageCount": 1,
+            "total": 3
+        }
+    }
+}

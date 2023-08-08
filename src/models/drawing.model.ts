@@ -17,7 +17,7 @@ export interface DrawingAttributes {
     publishedAt?: string
     style?: string
     picture?: string
-    isSelected?: boolean
+    // isSelected?: boolean
 }
 
 export interface Picture {

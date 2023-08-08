@@ -1,0 +1,26 @@
+.container-svg .star path {
+    fill: lightgrey;
+    // stroke: blue;
+    stroke-width: 30;
+    stroke-dashoffset: 0;
+    stroke-dasharray: 1810;
+}
+.container-svg .starend path {
+    animation: animate-star 0.8s linear forwards;
+}
+@keyframes animate-star {
+    0% {
+        stroke-dashoffset: 0;
+    }
+    40% {
+        stroke-dashoffset: 1810;
+    }
+    80% {
+        stroke-dashoffset: 3020;
+        fill: transparent;
+    }
+    100% {
+        stroke-dashoffset: 4000;
+        fill: rgb(251, 209, 0);
+    }
+}
