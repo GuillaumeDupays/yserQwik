@@ -1,19 +1,39 @@
 import { User } from '~/models/user'
-import { $ } from '@builder.io/qwik'
+import { $, component$, useResource$ } from '@builder.io/qwik'
+import {
+    RequestHandler,
+    requestHandler,
+} from '@builder.io/qwik-city/middleware/request-handler'
+import {
+    API,
+    AUTH_TOKEN,
+    UserInfo,
+    setToken,
+    useStoreUser,
+} from '~/helpers/helpers'
 
-const API = 'http://localhost:1337'
-
-export const authService = $(async (payload: User) => {
+export const useTattooService = async (payload: User) => {
     console.log('payload', payload)
 
-    const response = await fetch(`${API}/auth/local`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-    })
-    const data = await response.json()
-    // setToken(data.jwt)
-    return data
-})
+    try {
+        const response = await fetch('http://localhost:1337/api/auth/local', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: '*/*',
+            },
+            body: JSON.stringify(payload),
+        })
+
+        if (!response.ok) {
+            throw new Error('Method Not Allowed')
+        }
+
+        const data = await response.json()
+        setToken(data.jwt) // Assurez-vous que setToken est correctement défini et accessible ici
+        return data
+    } catch (error) {
+        console.error('Error:', error)
+        throw error
+    }
+}

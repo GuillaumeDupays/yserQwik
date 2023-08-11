@@ -1,0 +1,32 @@
+.container-center {
+    display: flex;
+    flex-direction: column;
+    // justify-content: space-evenly;
+    align-items: center;
+    // border: 2px solid green;
+    height: 80vh;
+    // height: calc(100vh - 53.33px);
+}
+form {
+    display: flex;
+    flex-direction: column;
+    height: 30vh;
+    width: 50%;
+    // border: 2px solid red;
+    justify-content: space-between;
+    margin: 2em;
+}
+.container-footer {
+    // border: 2px solid blue;
+    height: 20vh;
+}
+input {
+    border: none;
+    padding: 1em;
+    border-radius: 5px;
+}
+
+input:focus {
+    // outline: 1px solid blue;
+    outline: none;
+}

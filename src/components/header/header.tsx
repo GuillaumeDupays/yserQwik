@@ -12,6 +12,9 @@ export default component$(() => {
                 <ul>
                     <Link href="/reservation">Réserver un créneau</Link>
                 </ul>
+                <ul>
+                    <Link href="/login">Se connecter</Link>
+                </ul>
             </header>
         </>
     )

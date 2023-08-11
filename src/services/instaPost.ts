@@ -6,7 +6,7 @@ const API = 'http://localhost:1337'
 export const postRefactoredInstaPostService = $(async (post: InstaPost) => {
     console.log('post', post)
 
-    const response = await fetch(`${API}/api/dessins`, {
+    const response = await fetch(`${API}/api/projets`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

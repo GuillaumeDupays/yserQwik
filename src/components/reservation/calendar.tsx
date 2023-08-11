@@ -14,6 +14,7 @@ import { JSX } from '@builder.io/qwik/jsx-runtime'
 import { Modal } from './modal'
 
 import { days, months } from './dates'
+import ChevronBtn from '../svg/chevronBtn'
 
 export default component$(() => {
     useStylesScoped$(calendarStyle)
@@ -203,7 +204,12 @@ export default component$(() => {
                 {months[storeDate.mois]} {storeDate.annee}
             </h3>
             <button onClick$={() => previousMonth()}>Left</button>
-            <button onClick$={() => nextMonth()}>Right</button>
+
+            <button onClick$={() => nextMonth()}></button>
+            <ChevronBtn
+                onClick$={() => previousMonth()}
+                direction="left"
+            ></ChevronBtn>
             <p>Nous sommes aujourd'hui {days[storeDate.jour - 1]}</p>
 
             <table>
@@ -211,22 +217,24 @@ export default component$(() => {
             </table>
             <section>
                 <p>
-                    Vous avez sélectionné :{' '}
-                    {storeDate.date.toLocaleDateString()}
+                    Créneau sélectionné : {storeDate.date.toLocaleDateString()}
                 </p>
                 {!storeReservation.some(
                     (e) =>
                         e.isReserved &&
                         storeDate.date.toLocaleDateString() === e.dateResa
                 ) && (
-                    <button onClick$={() => onReserved(storeDate.date)}>
-                        Réserver
-                    </button>
+                    <div>
+                        <h3>Ce créneau est disponible</h3>
+                        <button onClick$={() => onReserved(storeDate.date)}>
+                            Réserver
+                        </button>
+                    </div>
                 )}
                 {storeReservation.map((e) =>
                     storeDate.date.toLocaleDateString() === e.dateResa ? (
                         <div>
-                            <p>Vous avez réservé pour le : {e.dateResa}</p>
+                            <h3>Vous avez réservé pour le : {e.dateResa}</h3>
                             <p>{e.commentaire}</p>
                             {e.isReserved && (
                                 <button
@@ -237,7 +245,7 @@ export default component$(() => {
                             )}
                         </div>
                     ) : (
-                        'pas réservé'
+                        ''
                     )
                 )}
             </section>

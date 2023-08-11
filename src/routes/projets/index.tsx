@@ -12,9 +12,10 @@ import projet from '../../mock/projet.json'
 import styleProjets from '../projets/projets.scss?inline'
 import InstaPost from '~/models/instapost'
 import Star from '~/components/star/star'
+import Header from '~/components/header/header'
 
 const token =
-    'EAArZBObBAW7gBO255Qn79ji7EiVPB20IlizZCCNluSrYJeF6ZBOYXq8RlF4yOBfOQ1hZB2zcODZACqgKrtkTcFDlSZCwRvahLRD0QuDU0KKIVVBbMyEZAPdZADJh3viV77HX9dbKiv3UmfkVQzQxIFrc79nNalQo4zXA0rVZACM4hzgzHZB5eFaQTEcK9bEkTJjr78nZCR9I15Y5le7tnGK5Hk5Y0KMSGwRsfJQrXlPvfMR3acDigWZALCQLsKwZBxSDNdWBWfUUoUYwZD'
+    'EAArZBObBAW7gBO2rmS7kN6TfjmgvQqrixDpH6R3p5pMRGMnHiEleg8bmBkKkXnrs0wT9UZCwXugI29yaZBovQkdIZACUTSuZCiAGXZAbYi71wSsFJWrpE2BKV7w5U4LUyF0zkQGYaVoGmH4D7Ec3g6NaKkLyPS4vhxFO6Tp6S6YIKnZCisEHX1QjZA90iDhO3NEncBuOGECHpL5xEZAHONxIzmGYWEE7eZCmL7bSW9YHsudZBz98V44ikbjvQNJt5kcup4Kr4KVcAZDZD'
 export const instaApi = routeLoader$(async () => {
     const url =
         'https://graph.facebook.com/me/feed?fields=object_id,permalink_url,full_picture,message'
@@ -48,16 +49,9 @@ export default component$(() => {
 
     const postRefactoredInstaPost = () => {}
 
-    const storePost = useStore<InstaPost[]>([
-        {
-            full_picture: '',
-            id: '',
-            message: '',
-            object_id: '',
-            permalink_url: '',
-            tarif: 0,
-        },
-    ])
+    const storePost = useStore<InstaPost[]>([])
+
+    const storeUserPostSelection = useStore<InstaPost[]>([])
 
     const styleSignal = useSignal('TOUS LES PROJETS')
 
@@ -80,13 +74,34 @@ export default component$(() => {
     console.log('useApiInsta', useApiInsta)
     const isSelectedBtn = useSignal(false)
     const isSelected = useSignal(false)
-    const selectStar = $((e: boolean | undefined) => {
-        console.log('checkbox', e)
-        if (e === undefined && isSelected.value === false) {
-            isSelected.value = true
+
+    const selectStar = $((e: InstaPost) => {
+        const existingSelection = storeUserPostSelection.find(
+            (selection) => e.id === selection.id
+        )
+
+        if (existingSelection) {
+            // isSelected.value = false
+
+            // Supprimer l'élément existant de storeUserPostSelection
+            const index = storeUserPostSelection.indexOf(existingSelection)
+            if (index !== -1) {
+                storeUserPostSelection.splice(index, 1)
+            }
         } else {
-            isSelected.value = false
+            // isSelected.value = true
+            // Ajouter la nouvelle sélection à storeUserPostSelection
+            const newSelection = {
+                full_picture: e.full_picture,
+                id: e.id,
+                message: e.message,
+                object_id: e.object_id,
+                permalink_url: e.permalink_url,
+                tarif: 220,
+            }
+            storeUserPostSelection.push(newSelection)
         }
+        console.log('store user', storeUserPostSelection)
     })
 
     const selectPost = $((post: InstaPost) => {
@@ -107,7 +122,8 @@ export default component$(() => {
     })
     return (
         <>
-            <div class={'container-filtered-btns'}>
+            <Header></Header>
+            {/* <div class={'container-filtered-btns'}>
                 {useToFiltered.value.map(
                     (btnStyle) =>
                         btnStyle && (
@@ -123,7 +139,7 @@ export default component$(() => {
                             </button>
                         )
                 )}
-            </div>
+            </div> */}
 
             <div class={'content-page'}>
                 <h1>PROJETS DISPONIBLES</h1>
@@ -148,16 +164,19 @@ export default component$(() => {
                                         // onChange$={() =>
                                         //     console.log('change', 2)
                                         // }
-                                        isSelected={isSelected.value}
-                                        onClick$={() =>
-                                            selectStar(e.isSelected)
-                                        }
+                                        isSelected={storeUserPostSelection.some(
+                                            (s) =>
+                                                s.id === e.id
+                                                    ? (isSelected.value = true)
+                                                    : (isSelected.value = false)
+                                        )}
+                                        onClick$={() => selectStar(e)}
                                     ></Star>
 
                                     <button
                                         onClick$={() => selectPost(e)}
                                         class={storePost.map((r) =>
-                                            r.id.includes(e.id)
+                                            r.id === e.id
                                                 ? 'clicked'
                                                 : 'filtered-btn'
                                         )}
