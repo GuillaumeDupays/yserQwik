@@ -1,15 +1,17 @@
 .container-center {
     display: flex;
     flex-direction: column;
-    // justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
     // border: 2px solid green;
-    height: 80vh;
-    // height: calc(100vh - 53.33px);
+    // height: 80vh;
+    height: calc(100vh - 53.33px);
 }
 form {
     display: flex;
     flex-direction: column;
+    position: absolute;
+    top: 30vh;
     height: 30vh;
     width: 50%;
     // border: 2px solid red;
@@ -18,6 +20,8 @@ form {
 }
 .container-footer {
     // border: 2px solid blue;
+    position: absolute;
+    bottom: 0;
     height: 20vh;
 }
 input {

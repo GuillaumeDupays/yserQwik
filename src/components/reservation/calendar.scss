@@ -1,22 +1,35 @@
 .container-calendar {
     // display: flex;
+
     // flex-direction: column;
     text-align: center;
+    border: 2px solid pink;
 }
 
 .container-days {
     display: flex;
+    border: 2px solid green;
+}
+
+.cellStyle {
+    border: none;
+    padding: 10px;
+    text-align: center;
 }
 .days {
-    width: 14.285714285714286%;
+    // width: 14.285714285714286%;
     background-color: #f0f0f0;
-    border: 1px solid #ccc;
+    // border: 1px solid red;
     padding: 10px;
-    box-sizing: border-box;
+    // box-sizing: border-box;
 }
 
 table {
     margin: auto;
+    // border: 2px solid orange;
+    border-collapse: collapse;
+    // width: 50%;
+    height: 35vh;
 }
 
 .notAvailable {
@@ -25,4 +38,17 @@ table {
 
 .available {
     background: green;
+}
+
+header {
+    display: flex;
+    justify-content: space-around;
+}
+.box-table-btns {
+    display: flex;
+    align-items: center;
+    padding: 1em;
+    max-width: 80%;
+    justify-content: center;
+    margin: auto;
 }

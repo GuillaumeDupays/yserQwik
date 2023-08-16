@@ -50,6 +50,18 @@ export function validateEmail(email: string) {
     return false
 }
 
+export const formatDate = (inputDate: string) => {
+    const parts = inputDate.split('-')
+    if (parts.length === 3) {
+        const year = parts[0]
+        const month = parts[1]
+        const day = parts[2]
+        return `${day}/${month}/${year}`
+    } else {
+        return 'Format de date invalide.'
+    }
+}
+
 export function validatePassword(pwd: string) {
     if (pwd.length >= 8 && pwd.length <= 25) {
         return true
