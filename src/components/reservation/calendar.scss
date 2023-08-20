@@ -1,54 +1,54 @@
 .container-calendar {
-    // display: flex;
+   // display: flex;
 
-    // flex-direction: column;
-    text-align: center;
-    border: 2px solid pink;
+   // flex-direction: column;
+   text-align: center;
+   border: 2px solid pink;
 }
 
 .container-days {
-    display: flex;
-    border: 2px solid green;
+   display: flex;
+   border: 2px solid green;
 }
 
 .cellStyle {
-    border: none;
-    padding: 10px;
-    text-align: center;
+   border: none;
+   padding: 10px;
+   text-align: center;
 }
 .days {
-    // width: 14.285714285714286%;
-    background-color: #f0f0f0;
-    // border: 1px solid red;
-    padding: 10px;
-    // box-sizing: border-box;
+   // width: 14.285714285714286%;
+   background-color: #f0f0f0;
+   // border: 1px solid red;
+   padding: 10px;
+   // box-sizing: border-box;
 }
 
 table {
-    margin: auto;
-    // border: 2px solid orange;
-    border-collapse: collapse;
-    // width: 50%;
-    height: 35vh;
+   margin: auto;
+   // border: 2px solid orange;
+   border-collapse: collapse;
+   // width: 50%;
+   height: 35vh;
 }
 
 .notAvailable {
-    background: grey;
+   background: rgb(201, 186, 126);
 }
 
 .available {
-    background: green;
+   background: green;
 }
 
 header {
-    display: flex;
-    justify-content: space-around;
+   display: flex;
+   justify-content: space-around;
 }
 .box-table-btns {
-    display: flex;
-    align-items: center;
-    padding: 1em;
-    max-width: 80%;
-    justify-content: center;
-    margin: auto;
+   display: flex;
+   align-items: center;
+   padding: 1em;
+   max-width: 80%;
+   justify-content: center;
+   margin: auto;
 }

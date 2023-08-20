@@ -1,0 +1,76 @@
+.form-card {
+   background-color: white;
+   border-radius: 5px;
+   padding: 20px;
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+   width: 80%;
+   max-width: 400px;
+}
+
+.row {
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+   border: 1px solid green;
+}
+.column {
+   border: 1px solid red;
+   flex-direction: column;
+}
+
+.input-row {
+   display: flex;
+   justify-content: space-between;
+   flex-wrap: wrap;
+   // height: 5em;
+   // border: 2px solid orange;
+}
+.input-group label {
+   margin-bottom: 5px;
+   height: 2em;
+   width: fit-content;
+}
+.input-group input {
+   padding: 10px;
+   border: 1px solid #ccc;
+   border-radius: 3px;
+}
+.input-group {
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   margin-bottom: 15px;
+
+   // border: 2px solid blue;
+}
+
+.form-label-before {
+   // border: 2px solid green;
+   margin-bottom: 5px;
+   height: 2em;
+   border: 2px solid red;
+   color: green;
+   // width: fit-content;
+}
+
+.form-label-focus-in {
+   // transform: translateX(calc(var(--label-nom)));
+   // width: fit-content;
+   border: 2px solid red;
+   font-size: small;
+   color: red;
+   height: 2em;
+   // transition: 400ms ease-in-out;
+}
+.focused {
+   //largeur de l'input - largeur du label
+   transform: translateX(127px);
+   transition: transform 0.3s ease-in-out;
+}
+.form-label-focus-out {
+   border: 2px solid red;
+   // width: fit-content;
+   // transform: translateX(0);
+   height: 2em;
+   // transition: 400ms ease-in-out;
+}

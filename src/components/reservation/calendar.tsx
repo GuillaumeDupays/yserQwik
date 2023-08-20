@@ -17,7 +17,11 @@ import { Modal } from './modal'
 import { days, months } from './dates'
 import ChevronBtn from '../svg/chevronBtn'
 import { routeLoader$ } from '@builder.io/qwik-city'
-import { getReservations } from '~/services/reservation'
+import {
+   deleteReservation,
+   getReservations,
+   postReservation,
+} from '~/services/reservation'
 import { Reservation } from '~/models/reservation'
 import reservation from '~/routes/reservation'
 import { formatDate } from '~/helpers/helpers'
@@ -28,6 +32,7 @@ export default component$(() => {
          const reservations = await getReservations()
          const formattedCreneau = reservations.map((e) => {
             const obj = {
+               id: e.id,
                attributes: {
                   creneau: formatDate(e.attributes.creneau),
                   isAvailable: e.attributes.isAvailable,
@@ -66,7 +71,7 @@ export default component$(() => {
       annee: new Date().getFullYear(),
       mois: new Date().getMonth(),
       jour: new Date().getDay(),
-      isAvailable: true,
+      isSelected: false,
    })
 
    const totalDivs = 38
@@ -138,9 +143,19 @@ export default component$(() => {
             date.toLocaleDateString() === reservation.attributes.creneau
       )
 
+      console.log('existingReservationIndex', existingReservationIndex)
+
+      const findId = stateReservation.reservations.find((resa, i) =>
+         existingReservationIndex === i ? resa.id : null
+      )
+      console.log('findId', findId)
+
       if (existingReservationIndex !== -1) {
          if (update === 'delete') {
             stateReservation.reservations.splice(existingReservationIndex, 1)
+            console.log('state resa not exist', stateReservation.reservations)
+
+            deleteReservation(findId?.id!)
          } else {
             stateReservation.reservations[
                existingReservationIndex
@@ -155,11 +170,13 @@ export default component$(() => {
             },
          }
          stateReservation.reservations.push(newReservation)
+         postReservation(newReservation)
       }
       console.log('store resa', stateReservation.reservations)
    })
 
    const reservedSlot = $((date: Date) => {
+      storeDate.isSelected = true
       storeDate.date = date
    })
 
@@ -259,7 +276,11 @@ export default component$(() => {
             ></ChevronBtn>
          </div>
          <section>
-            <p>Créneau sélectionné : {storeDate.date.toLocaleDateString()}</p>
+            {storeDate.isSelected && (
+               <p>
+                  Créneau sélectionné : {storeDate.date.toLocaleDateString()}
+               </p>
+            )}
             {stateReservation.reservations.map(
                (e) =>
                   e.attributes.creneau ===
@@ -281,17 +302,19 @@ export default component$(() => {
                      </div>
                   )
             )}
-            {!stateReservation.reservations.some(
-               (e) =>
-                  e.attributes.creneau === storeDate.date.toLocaleDateString()
-            ) && (
-               <div>
-                  <h3>Ce créneau est disponible</h3>
-                  <button onClick$={() => onReserved(storeDate.date)}>
-                     Réserver
-                  </button>
-               </div>
-            )}
+            {storeDate.isSelected &&
+               !stateReservation.reservations.some(
+                  (e) =>
+                     e.attributes.creneau ===
+                     storeDate.date.toLocaleDateString()
+               ) && (
+                  <div>
+                     <h3>Ce créneau est disponible</h3>
+                     <button onClick$={() => onReserved(storeDate.date)}>
+                        Réserver
+                     </button>
+                  </div>
+               )}
          </section>
 
          {
