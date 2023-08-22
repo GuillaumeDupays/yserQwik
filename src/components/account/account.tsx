@@ -55,7 +55,7 @@ export default component$(() => {
       connectionError: '',
    })
 
-   const handleInput = $(
+   const inputValidation = $(
       (
          e: Event,
          validationFn: (value: string) => boolean,
@@ -64,8 +64,6 @@ export default component$(() => {
       ) => {
          const capture = e.target as HTMLInputElement
          const value = capture.value.trim()
-         const name = capture.name
-         console.log('name', name)
 
          const isValid = validationFn(value)
          storeErrorMessages[fieldName] = isValid ? '' : invalidMessage
@@ -74,7 +72,7 @@ export default component$(() => {
    )
 
    const handleInputEmail = $((e: Event) => {
-      handleInput(
+      inputValidation(
          e,
          validateEmail,
          'identifier',
@@ -83,7 +81,7 @@ export default component$(() => {
    })
 
    const handleInputPassword = $((e: Event) => {
-      handleInput(
+      inputValidation(
          e,
          validatePassword,
          'password',

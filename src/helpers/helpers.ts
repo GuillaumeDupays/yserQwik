@@ -1,4 +1,11 @@
-import { $, createContextId, useContext, useStore } from '@builder.io/qwik'
+import {
+   $,
+   QwikFocusEvent,
+   createContextId,
+   useContext,
+   useStore,
+} from '@builder.io/qwik'
+import { HtmlStore } from '~/models/inputForm'
 import { UserSessionCtxt } from '~/routes/layout'
 
 export const AVATAR_API = 'https://ui-avatars.com/api'
@@ -50,6 +57,28 @@ export function validateEmail(email: string) {
    return false
 }
 
+export const isUserOfLegalAge = (birthdate: Date): boolean => {
+   const currentDate = new Date()
+   const age = currentDate.getFullYear() - birthdate.getFullYear()
+   const monthDiff = currentDate.getMonth() - birthdate.getMonth()
+
+   if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && currentDate.getDate() < birthdate.getDate())
+   ) {
+      return age >= 18
+   }
+
+   return age >= 18
+}
+
+export const isPhoneNumberValid = (phoneNumber: string): boolean => {
+   // Define a regular expression for the desired phone number format
+   const phoneNumberRegex = /^[0-9]{10}$/ // This example assumes 10-digit numbers
+
+   return phoneNumberRegex.test(phoneNumber)
+}
+
 export const formatDate = (inputDate: string) => {
    const parts = inputDate.split('-')
    if (parts.length === 3) {
@@ -88,6 +117,78 @@ export const isEqualString = (A: string, B: string): boolean => {
    console.log('b', B)
 
    return A === B ? true : false
+}
+
+// export const errorMsg = (type: string, capture: string, store: HtmlStore[]) => {
+//    console.log('capture', capture)
+
+//    const targetInput = store.find((e) => e.inputType!.type === type)
+//    console.log('targetInput', targetInput)
+
+//    switch (type) {
+//       case 'email':
+//          const isEmailValid = validateEmail(capture)
+//          return !isEmailValid
+//             ? (targetInput!.errorMessage =
+//                  'Veuillez saisir un numéro de téléphone valide')
+//             : ''
+
+//       case 'tel':
+//          const isTelValid = isPhoneNumberValid(capture)
+//          return !isTelValid
+//             ? (targetInput!.errorMessage =
+//                  'Veuillez saisir un numéro de téléphone valide')
+//             : ''
+
+//       case 'date':
+//          console.log('capture date', capture)
+//          const birthdate = new Date(capture)
+//          console.log('bith', birthdate)
+
+//          const isAgeValid = isUserOfLegalAge(birthdate)
+//          console.log('isAGE', isAgeValid)
+
+//          return isAgeValid
+//             ? ''
+//             : (targetInput!.errorMessage =
+//                  'Vous devez être majeur pour vous inscrire')
+//    }
+// }
+export const errorMsg = (type: string, capture: string, store: HtmlStore[]) => {
+   const targetInput = store.find((e) => e.inputType?.type === type)
+
+   if (!targetInput) {
+      console.error(`Target input with type '${type}' not found.`)
+      return
+   }
+
+   switch (type) {
+      case 'email':
+         const isEmailValid = validateEmail(capture)
+         targetInput.errorMessage = !isEmailValid ? 'Email invalide' : ''
+         break
+
+      case 'tel':
+         const isTelValid = isPhoneNumberValid(capture)
+         targetInput.errorMessage = !isTelValid
+            ? 'N° de téléphone invalide'
+            : ''
+         break
+
+      case 'date':
+         const birthdate = new Date(capture)
+         const isAgeValid = isUserOfLegalAge(birthdate)
+         targetInput.errorMessage = isAgeValid ? '' : 'Vous devez être majeur'
+         break
+      case 'text':
+         const isTextValid = capture ? capture.length >= 2 : ''
+         targetInput.errorMessage = isTextValid ? '' : ''
+         break
+
+      default:
+         console.error(`Unsupported input type '${type}'.`)
+         break
+   }
 }
 
 export function useStoreUser() {

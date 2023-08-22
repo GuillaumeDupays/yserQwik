@@ -40,6 +40,8 @@
    flex-direction: column;
    justify-content: space-between;
    margin-bottom: 15px;
+   position: relative;
+   margin: 1%;
 
    // border: 2px solid blue;
 }
@@ -61,6 +63,20 @@
    color: red;
    height: 2em;
    // transition: 400ms ease-in-out;
+}
+.error-message {
+   // position: absolute;
+   // z-index: 1;
+   // background-color: #ff0000;
+   font-size: small;
+   // color: white;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+
+   // height: 100%;
+   width: 100%;
+   border-radius: 5px;
 }
 .focused {
    //largeur de l'input - largeur du label
