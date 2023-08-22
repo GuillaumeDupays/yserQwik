@@ -15,6 +15,7 @@ export interface LabelType {
    labelName: string
    labelClass?: string
    labelWidth?: number
+   errorSpanWidth?: number
    transformLength?: number
 }
 export interface HtmlStore {
