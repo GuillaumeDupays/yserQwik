@@ -214,13 +214,13 @@ export default component$(() => {
       },
    ]
 
-   const measureElementWidth = $((element: HTMLElement): number => {
-      const styles = window.getComputedStyle(element)
-      document.body.appendChild(element)
-      const width = element.offsetWidth
-      document.body.removeChild(element)
-      return width
-   })
+   // const measureElementWidth = $((element: HTMLElement): number => {
+   //    const styles = window.getComputedStyle(element)
+   //    document.body.appendChild(element)
+   //    const width = element.offsetWidth
+   //    document.body.removeChild(element)
+   //    return width
+   // })
 
    const createInput = $(
       async (
@@ -229,6 +229,7 @@ export default component$(() => {
          required: boolean
       ): Promise<InputType> => {
          const element = document.createElement('input')
+
          element.type = type
 
          const input: InputType = {
@@ -238,9 +239,6 @@ export default component$(() => {
             required,
             isFocused: false,
          }
-
-         const inputWidth = await measureElementWidth(element)
-         input.inputWidth = inputWidth
 
          return input
       }
@@ -255,10 +253,10 @@ export default component$(() => {
          const element = document.createElement('label')
          element.textContent = labelText
          const label: LabelType = { element, labelId, labelName }
-         const labelWidth = await measureElementWidth(element)
+         // const labelWidth = await measureElementWidth(element)
 
          label.element.htmlFor = labelId
-         label.labelWidth = labelWidth
+         // label.labelWidth = labelWidth
 
          return label
       }
@@ -299,21 +297,27 @@ export default component$(() => {
    const handleInputFocus = $((e: QwikFocusEvent) => {
       const targetName = (e.target as HTMLInputElement).name
       console.log('targetname', targetName)
+      const width = (e.target as HTMLInputElement).offsetWidth
+      console.log('width direct', width)
+      const labelWidth = document.querySelector(
+         `label[for="${targetName}"]`
+      ) as HTMLLabelElement
 
-      storeHtml.forEach(async (item) => {
-         if (item.labelType?.labelName === targetName) {
-            item.inputType!.isFocused = true
+      storeHtml.forEach(async ({ labelType, inputType }) => {
+         if (labelType?.labelName === targetName) {
+            inputType!.isFocused = true
+            inputType!.inputWidth = width
+            labelType.labelWidth = labelWidth.offsetWidth
+            labelType.transformLength =
+               inputType?.inputWidth! - labelType.labelWidth!
 
-            item.labelType.transformLength =
-               item.inputType?.inputWidth! - item.labelType.labelWidth!
-
-            item.labelType.labelClass = await animeLabel(
-               item.labelType.transformLength,
+            labelType.labelClass = await animeLabel(
+               labelType.transformLength,
                'red'
             )
          } else {
-            item.inputType!.isFocused = false
-            item.labelType!.labelClass = await animeLabel(0, 'blue')
+            inputType!.isFocused = false
+            labelType!.labelClass = await animeLabel(0, 'blue')
          }
       })
    })
@@ -385,7 +389,7 @@ export default component$(() => {
                            type={item.inputType?.type}
                            name={item.inputType?.inputName}
                            class={'input-form'}
-                           width={item.inputType?.inputWidth}
+                           // width={item.inputType?.inputWidth}
                            required={true}
                            onInput$={(e: InputEvent) => isValidInput(e)}
                            onFocus$={(e: QwikFocusEvent) => handleInputFocus(e)}
