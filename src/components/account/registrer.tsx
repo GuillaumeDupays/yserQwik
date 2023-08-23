@@ -6,11 +6,12 @@ import {
    QwikFocusEvent,
    useVisibleTask$,
    useTask$,
+   useSignal,
 } from '@builder.io/qwik'
 
 import registerStyle from './register.scss?inline'
 import { Form } from '@builder.io/qwik-city'
-
+import { minLength } from '@modular-forms/qwik'
 import { errorMsg } from '~/helpers/helpers'
 import { HtmlStore, InputType, LabelType } from '~/models/inputForm'
 
@@ -72,6 +73,9 @@ export default component$(() => {
       },
    ]
 
+   const useInputValueSignal = useSignal('')
+   const useErrorMsgWidthSignal = useSignal(0)
+
    const createInput = $(
       async (
          inputName: string,
@@ -79,6 +83,7 @@ export default component$(() => {
          required: boolean
       ): Promise<InputType> => {
          const element = document.createElement('input')
+
          element.type = type
 
          const input: InputType = {
@@ -102,15 +107,21 @@ export default component$(() => {
          const element = document.createElement('label')
          element.textContent = labelText
          const label: LabelType = { element, labelId, labelName }
+
          label.element.htmlFor = labelId
 
          return label
       }
    )
+   interface AnimeLabelParams {
+      translateLength: number
+      color: string
+   }
 
-   const animeLabel = $((length: number, color: string) => {
-      const animation = ` transform: translateX(${length}px);
-    transition: transform 0.3s ease-in-out;color: ${color}`
+   const animeLabel = $(({ translateLength, color }: AnimeLabelParams) => {
+      const animation = ` transform: translateX(${translateLength}px);
+    transition: transform 0.3s ease-in-out;color: ${color}; `
+
       return animation
    })
 
@@ -120,13 +131,34 @@ export default component$(() => {
       const targetInput = storeHtml.find(
          (e) => inputName === e.inputType!.inputName
       )
+      const errorMessageSpan = document.querySelector(
+         `label .error-message`
+      ) as HTMLSpanElement
+
+      if (targetInput) {
+         useInputValueSignal.value = capture
+         targetInput.inputType!.userCapture = useInputValueSignal.value
+         if (useInputValueSignal.value) {
+            if (errorMessageSpan) {
+               targetInput.labelType!.labelClass = await animeLabel({
+                  translateLength: 0,
+                  color: 'green',
+               })
+               errorMsg(
+                  targetInput.inputType?.inputName!,
+                  targetInput.inputType!.userCapture!,
+                  storeHtml
+               )
+            }
+         }
+      }
    })
 
    const handleInputFocus = $((e: QwikFocusEvent) => {
       const targetName = (e.target as HTMLInputElement).name
-
+      console.log('targetname', targetName)
       const width = (e.target as HTMLInputElement).offsetWidth
-
+      console.log('width direct', width)
       const labelWidth = document.querySelector(
          `label[for="${targetName}"]`
       ) as HTMLLabelElement
@@ -138,16 +170,26 @@ export default component$(() => {
             labelType.labelWidth = labelWidth.offsetWidth
             labelType.transformLength =
                inputType?.inputWidth! - labelType.labelWidth!
-
-            labelType.labelClass = await animeLabel(
-               labelType.transformLength,
-               'green'
+            console.log(
+               'FOCUS labelType.transformLength',
+               labelType.transformLength
             )
+
+            labelType.labelClass = await animeLabel({
+               translateLength: labelType.transformLength,
+               color: 'green',
+            })
+         } else {
+            inputType!.isFocused = false
+            labelType!.labelClass = await animeLabel({
+               translateLength: 0,
+               color: 'blue',
+            })
          }
       })
    })
 
-   const handleInputBlur = $((blurEvent: QwikFocusEvent) => {
+   const handleInputBlur = $(async (blurEvent: QwikFocusEvent) => {
       const targetName = (blurEvent.target as HTMLInputElement).name
       console.log('targetname', targetName)
 
@@ -159,7 +201,10 @@ export default component$(() => {
       if (targetInput) {
          targetInput.inputType!.isFocused = false
          targetInput.labelType!.transformLength = 0
-
+         targetInput.labelType!.labelClass = await animeLabel({
+            translateLength: targetInput.labelType!.transformLength,
+            color: 'green',
+         })
          errorMsg(targetName, targetInput.inputType!.userCapture!, storeHtml)
       }
    })
@@ -186,7 +231,10 @@ export default component$(() => {
    })
 
    useVisibleTask$(({ track }) => {
-      track(() => {})
+      track(() => {
+         useInputValueSignal.value, useErrorMsgWidthSignal.value
+      })
+      console.log(' useErrorMsgWidthSignal.value', useErrorMsgWidthSignal.value)
    })
 
    return (
@@ -202,15 +250,7 @@ export default component$(() => {
                         <label
                            id={item.labelType?.labelId}
                            for={item.labelType?.labelName}
-                           style={
-                              item.inputType?.isFocused && !item.errorMessage
-                                 ? item.labelType?.labelClass
-                                 : `transform: translateX(calc(${
-                                      item.labelType?.transformLength! -
-                                      item.errorMessage?.length!
-                                   })px);
-                 transition: transform 0.3s ease-in-out;`
-                           }
+                           style={item.labelType?.labelClass}
                         >
                            {item.errorMessage ? (
                               <span class="error-message">
@@ -224,10 +264,10 @@ export default component$(() => {
                            type={item.inputType?.type}
                            name={item.inputType?.inputName}
                            class={'input-form'}
-                           required={true}
                            placeholder={
                               item.errorMessage ? item.labelType?.labelId : ''
                            }
+                           required={true}
                            onInput$={(e: InputEvent) => isValidInput(e)}
                            onFocus$={(e: QwikFocusEvent) => handleInputFocus(e)}
                            onBlur$={(e: QwikFocusEvent) => handleInputBlur(e)}
