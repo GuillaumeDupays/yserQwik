@@ -10,13 +10,8 @@ import {
 
 import registerStyle from './register.scss?inline'
 import { Form } from '@builder.io/qwik-city'
-import { minLength } from '@modular-forms/qwik'
-import {
-   errorMsg,
-   isPhoneNumberValid,
-   isUserOfLegalAge,
-   validateEmail,
-} from '~/helpers/helpers'
+
+import { errorMsg } from '~/helpers/helpers'
 import { HtmlStore, InputType, LabelType } from '~/models/inputForm'
 
 export default component$(() => {
@@ -24,160 +19,23 @@ export default component$(() => {
 
    const storeHtml = useStore<HtmlStore[]>([])
 
-   // const initLabelAndInput = $(
-   //    (
-   //       nameEl: string
-   //    ): {
-   //       inputType: InputType | undefined
-   //       labelType: LabelType | undefined
-   //    } => {
-   //       const label = document.querySelector(
-   //          `label[for="${nameEl}"]`
-   //       ) as HTMLLabelElement
-   //       const input = document.querySelector(
-   //          `[name="${nameEl}"]`
-   //       ) as HTMLInputElement
-
-   //       switch (nameEl) {
-   //          case 'Nom':
-   //             return {
-   //                inputType: {
-   //                   element: input,
-   //                   inputName: nameEl,
-   //                   type: 'text',
-   //                   minLength: 3,
-   //                   maxlength: 30,
-   //                   required: true,
-   //                   isFocused: false,
-   //                },
-   //                labelType: {
-   //                   element: label,
-   //                   labelId: nameEl, // You can adjust this as needed
-   //                   labelClass: '',
-   //                   labelWidth: 0,
-   //                   transformLength: 0,
-   //                },
-   //             }
-   //          case 'Prénom':
-   //             return {
-   //                inputType: {
-   //                   inputName: nameEl,
-   //                   element: input,
-   //                   type: 'text',
-   //                   minLength: 3,
-   //                   maxlength: 30,
-   //                   required: true,
-   //                   isFocused: false,
-   //                },
-   //                labelType: {
-   //                   labelId: nameEl, // You can adjust this as needed
-   //                   element: label,
-   //                   labelClass: '',
-   //                   labelWidth: 0,
-   //                   transformLength: 0,
-   //                },
-   //             }
-   //          case 'Email':
-   //             return {
-   //                inputType: {
-   //                   inputName: nameEl,
-   //                   element: input,
-   //                   type: 'email',
-   //                   minLength: 3,
-   //                   maxlength: 30,
-   //                   required: true,
-   //                   isFocused: false,
-   //                },
-   //                labelType: {
-   //                   labelId: nameEl, // You can adjust this as needed
-   //                   element: label,
-   //                   labelClass: '',
-   //                   labelWidth: 0,
-   //                   transformLength: 0,
-   //                },
-   //             }
-   //          case 'Numéro de téléphone':
-   //             return {
-   //                inputType: {
-   //                   inputName: nameEl,
-   //                   element: input,
-   //                   type: 'tel',
-   //                   minLength: 3,
-   //                   maxlength: 30,
-   //                   required: true,
-   //                   isFocused: false,
-   //                },
-   //                labelType: {
-   //                   labelId: nameEl, // You can adjust this as needed
-   //                   element: label,
-   //                   labelClass: '',
-   //                   labelWidth: 0,
-   //                   transformLength: 0,
-   //                },
-   //             }
-   //          case 'Date de naissance':
-   //             return {
-   //                inputType: {
-   //                   inputName: nameEl,
-   //                   element: input,
-   //                   type: 'date',
-   //                   minLength: 3,
-   //                   maxlength: 30,
-   //                   required: true,
-   //                   isFocused: false,
-   //                },
-   //                labelType: {
-   //                   labelId: nameEl, // You can adjust this as needed
-   //                   element: label,
-   //                   labelClass: '',
-   //                   labelWidth: 0,
-   //                   transformLength: 0,
-   //                },
-   //             }
-   //          case 'Ville de résidence':
-   //             return {
-   //                inputType: {
-   //                   inputName: nameEl,
-   //                   element: input,
-   //                   type: 'text',
-   //                   minLength: 3,
-   //                   maxlength: 30,
-   //                   required: true,
-   //                   isFocused: false,
-   //                },
-   //                labelType: {
-   //                   labelId: nameEl, // You can adjust this as needed
-   //                   element: label,
-   //                   labelClass: '',
-   //                   labelWidth: 0,
-   //                   transformLength: 0,
-   //                },
-   //             }
-   //          // ... Define other input types similarly
-   //          default:
-   //             console.log(`Sorry, we are out of ${nameEl}.`)
-   //             return { inputType: undefined, labelType: undefined }
-   //       }
-   //    }
-   // )
-
    const fields = [
       {
-         inputName: 'first_name',
+         inputName: 'prenom',
          type: 'text',
          required: true,
          label: 'Prénom',
-         labelName: 'first_name',
+         labelName: 'prenom',
          labelClass: '',
          labelWidth: 0,
          transformLength: 0,
       },
       {
-         inputName: 'last_name',
+         inputName: 'nom',
          type: 'text',
          required: true,
          label: 'Nom',
-         labelName: 'last_name',
+         labelName: 'nom',
          labelClass: '',
          labelWidth: 0,
          transformLength: 0,
@@ -214,14 +72,6 @@ export default component$(() => {
       },
    ]
 
-   // const measureElementWidth = $((element: HTMLElement): number => {
-   //    const styles = window.getComputedStyle(element)
-   //    document.body.appendChild(element)
-   //    const width = element.offsetWidth
-   //    document.body.removeChild(element)
-   //    return width
-   // })
-
    const createInput = $(
       async (
          inputName: string,
@@ -229,7 +79,6 @@ export default component$(() => {
          required: boolean
       ): Promise<InputType> => {
          const element = document.createElement('input')
-
          element.type = type
 
          const input: InputType = {
@@ -253,52 +102,31 @@ export default component$(() => {
          const element = document.createElement('label')
          element.textContent = labelText
          const label: LabelType = { element, labelId, labelName }
-         // const labelWidth = await measureElementWidth(element)
-
          label.element.htmlFor = labelId
-         // label.labelWidth = labelWidth
 
          return label
       }
    )
 
-   console.log('storeHtmlfirst', storeHtml)
-
    const animeLabel = $((length: number, color: string) => {
       const animation = ` transform: translateX(${length}px);
     transition: transform 0.3s ease-in-out;color: ${color}`
-
       return animation
    })
+
    const isValidInput = $(async (inputValue: InputEvent) => {
       const capture = (inputValue.target as HTMLInputElement).value
-      const inputType = (inputValue.target as HTMLInputElement).type
-
-      const targetInput = storeHtml.find((e) => e.inputType!.type === inputType)
-
-      const isValid = capture.length >= 2
-      const color = isValid ? 'green' : 'red'
-
-      // targetInput!.labelClass = await animeLabel(
-      //    targetInput!.transformLength!,
-      //    color
-      // )
-      if (targetInput) {
-         targetInput.inputType!.userCapture = capture
-
-         errorMsg(
-            targetInput.inputType?.type!,
-            targetInput.inputType!.userCapture!,
-            storeHtml
-         )
-      }
+      const inputName = (inputValue.target as HTMLInputElement).name
+      const targetInput = storeHtml.find(
+         (e) => inputName === e.inputType!.inputName
+      )
    })
 
    const handleInputFocus = $((e: QwikFocusEvent) => {
       const targetName = (e.target as HTMLInputElement).name
-      console.log('targetname', targetName)
+
       const width = (e.target as HTMLInputElement).offsetWidth
-      console.log('width direct', width)
+
       const labelWidth = document.querySelector(
          `label[for="${targetName}"]`
       ) as HTMLLabelElement
@@ -313,20 +141,18 @@ export default component$(() => {
 
             labelType.labelClass = await animeLabel(
                labelType.transformLength,
-               'red'
+               'green'
             )
-         } else {
-            inputType!.isFocused = false
-            labelType!.labelClass = await animeLabel(0, 'blue')
          }
       })
    })
 
    const handleInputBlur = $((blurEvent: QwikFocusEvent) => {
       const targetName = (blurEvent.target as HTMLInputElement).name
+      console.log('targetname', targetName)
 
       const targetInput = storeHtml.find(
-         (e) => e.inputType!.inputName === targetName
+         (e) => targetName === e.inputType!.inputName!
       )
       console.log('targetInput', targetInput)
 
@@ -334,16 +160,12 @@ export default component$(() => {
          targetInput.inputType!.isFocused = false
          targetInput.labelType!.transformLength = 0
 
-         errorMsg(
-            targetInput.inputType?.type!,
-            targetInput.inputType!.userCapture!,
-            storeHtml
-         )
+         errorMsg(targetName, targetInput.inputType!.userCapture!, storeHtml)
       }
    })
 
-   useTask$(() => {
-      fields.forEach(
+   useTask$(({ track }) => {
+      const promises = fields.map(
          async ({ inputName, type, required, label, labelName }) => {
             const input = await createInput(
                inputName,
@@ -352,9 +174,19 @@ export default component$(() => {
             )
             const labelEl = await createLabel(`${label}`, label, labelName)
 
-            storeHtml.push({ labelType: labelEl, inputType: input })
+            return { labelType: labelEl, inputType: input }
          }
       )
+
+      Promise.all(promises).then((results) => {
+         results.forEach(({ labelType, inputType }) => {
+            storeHtml.push({ labelType, inputType })
+         })
+      })
+   })
+
+   useVisibleTask$(({ track }) => {
+      track(() => {})
    })
 
    return (
@@ -371,9 +203,12 @@ export default component$(() => {
                            id={item.labelType?.labelId}
                            for={item.labelType?.labelName}
                            style={
-                              item.inputType?.isFocused
+                              item.inputType?.isFocused && !item.errorMessage
                                  ? item.labelType?.labelClass
-                                 : `transform: translateX(${item.labelType?.transformLength}px);
+                                 : `transform: translateX(calc(${
+                                      item.labelType?.transformLength! -
+                                      item.errorMessage?.length!
+                                   })px);
                  transition: transform 0.3s ease-in-out;`
                            }
                         >
@@ -389,8 +224,10 @@ export default component$(() => {
                            type={item.inputType?.type}
                            name={item.inputType?.inputName}
                            class={'input-form'}
-                           // width={item.inputType?.inputWidth}
                            required={true}
+                           placeholder={
+                              item.errorMessage ? item.labelType?.labelId : ''
+                           }
                            onInput$={(e: InputEvent) => isValidInput(e)}
                            onFocus$={(e: QwikFocusEvent) => handleInputFocus(e)}
                            onBlur$={(e: QwikFocusEvent) => handleInputBlur(e)}

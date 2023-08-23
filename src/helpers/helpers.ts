@@ -5,6 +5,7 @@ import {
    useContext,
    useStore,
 } from '@builder.io/qwik'
+import { InputType } from 'zlib'
 import { HtmlStore } from '~/models/inputForm'
 import { UserSessionCtxt } from '~/routes/layout'
 
@@ -154,15 +155,20 @@ export const isEqualString = (A: string, B: string): boolean => {
 //                  'Vous devez être majeur pour vous inscrire')
 //    }
 // }
-export const errorMsg = (type: string, capture: string, store: HtmlStore[]) => {
-   const targetInput = store.find((e) => e.inputType?.type === type)
+export const errorMsg = (
+   targetName: string,
+   capture: string,
+   store: HtmlStore[]
+) => {
+   const targetInput = store.find((e) => targetName === e.inputType!.inputName)
+   console.log('targetInput errorMsg', targetInput)
 
    if (!targetInput) {
-      console.error(`Target input with type '${type}' not found.`)
+      console.error(`Target input with type '${targetInput}' not found.`)
       return
    }
 
-   switch (type) {
+   switch (targetInput.inputType?.type) {
       case 'email':
          const isEmailValid = validateEmail(capture)
          targetInput.errorMessage = !isEmailValid ? 'Email invalide' : ''
@@ -181,12 +187,12 @@ export const errorMsg = (type: string, capture: string, store: HtmlStore[]) => {
          targetInput.errorMessage = isAgeValid ? '' : 'Vous devez être majeur'
          break
       case 'text':
-         const isTextValid = capture ? capture.length >= 2 : ''
-         targetInput.errorMessage = isTextValid ? '' : ''
+         const isTextNotValid = !capture
+         targetInput.errorMessage = isTextNotValid ? 'Champ requis' : ''
          break
 
       default:
-         console.error(`Unsupported input type '${type}'.`)
+         console.error(`Unsupported input type '${targetInput}'.`)
          break
    }
 }
