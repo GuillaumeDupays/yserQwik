@@ -10,7 +10,7 @@ import {
    QwikTouchEvent,
 } from '@builder.io/qwik'
 import ModalAccount, { ModalStore } from './modalAccount'
-import { Form, routeAction$ } from '@builder.io/qwik-city'
+import { Form, Link, routeAction$, useNavigate } from '@builder.io/qwik-city'
 import styleLogin from '../account/login.scss?inline'
 import {
    UserInfo,
@@ -131,9 +131,12 @@ export default component$(() => {
       }
    })
 
+   const nav = useNavigate()
+
    const handleRegister = $(() => {
       console.log('register')
       isRegister.value = true
+      nav('/inscription')
    })
 
    const logout = $(() => {
@@ -194,7 +197,8 @@ export default component$(() => {
                   )}
                </Form>
             )}
-            {isRegister.value && <Registrer></Registrer>}
+            {isRegister.value && <Link href="/inscription">S'inscrire</Link>}
+            {/* {isRegister.value && <Registrer></Registrer>} */}
             <p>{storeErrorMessages.connectionError}</p>
             {!userCtxt.user.blocked && (
                <div>

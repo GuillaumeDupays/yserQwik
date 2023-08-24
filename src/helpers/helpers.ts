@@ -120,42 +120,7 @@ export const isEqualString = (A: string, B: string): boolean => {
    return A === B ? true : false
 }
 
-// export const errorMsg = (type: string, capture: string, store: HtmlStore[]) => {
-//    console.log('capture', capture)
-
-//    const targetInput = store.find((e) => e.inputType!.type === type)
-//    console.log('targetInput', targetInput)
-
-//    switch (type) {
-//       case 'email':
-//          const isEmailValid = validateEmail(capture)
-//          return !isEmailValid
-//             ? (targetInput!.errorMessage =
-//                  'Veuillez saisir un numéro de téléphone valide')
-//             : ''
-
-//       case 'tel':
-//          const isTelValid = isPhoneNumberValid(capture)
-//          return !isTelValid
-//             ? (targetInput!.errorMessage =
-//                  'Veuillez saisir un numéro de téléphone valide')
-//             : ''
-
-//       case 'date':
-//          console.log('capture date', capture)
-//          const birthdate = new Date(capture)
-//          console.log('bith', birthdate)
-
-//          const isAgeValid = isUserOfLegalAge(birthdate)
-//          console.log('isAGE', isAgeValid)
-
-//          return isAgeValid
-//             ? ''
-//             : (targetInput!.errorMessage =
-//                  'Vous devez être majeur pour vous inscrire')
-//    }
-// }
-export const errorMsg = (
+export const validateForm = (
    targetName: string,
    capture: string,
    store: HtmlStore[]
@@ -171,30 +136,46 @@ export const errorMsg = (
    switch (targetInput.inputType?.type) {
       case 'email':
          const isEmailValid = validateEmail(capture)
-         targetInput.errorMessage = !isEmailValid ? 'Email invalide' : ''
+         targetInput.errorMessage = !isEmailValid ? 'Email invalide*' : ''
+         targetInput.inputType.userCapture = isEmailValid ? capture : ''
          break
 
       case 'tel':
          const isTelValid = isPhoneNumberValid(capture)
          targetInput.errorMessage = !isTelValid
-            ? 'N° de téléphone invalide'
+            ? 'N° de téléphone invalide*'
             : ''
+         targetInput.inputType.userCapture = isTelValid ? capture : ''
          break
 
       case 'date':
          const birthdate = new Date(capture)
          const isAgeValid = isUserOfLegalAge(birthdate)
-         targetInput.errorMessage = isAgeValid ? '' : 'Vous devez être majeur'
+         targetInput.errorMessage = isAgeValid ? '' : 'Vous devez être majeur*'
+         targetInput.inputType.userCapture = isAgeValid ? capture : ''
+         break
+      case 'password':
+         const isValidPwd = validatePassword(capture)
+         targetInput.errorMessage = isValidPwd ? '' : 'Mot de passe non valide*'
+         targetInput.inputType.userCapture = isValidPwd ? capture : ''
          break
       case 'text':
          const isTextNotValid = !capture
-         targetInput.errorMessage = isTextNotValid ? 'Champ requis' : ''
+         targetInput.errorMessage = isTextNotValid ? 'Champ requis*' : ''
+
          break
 
       default:
          console.error(`Unsupported input type '${targetInput}'.`)
          break
    }
+   // Après avoir validé le champ actuel, vérifions si tous les champs sont valides
+   const allFieldsValid = store.every((input) => input.errorMessage === '')
+
+   // Mettre à jour la valeur isFormValid dans chaque élément HtmlStore
+   store.forEach((input) => {
+      input.isFormValid = allFieldsValid
+   })
 }
 
 export function useStoreUser() {

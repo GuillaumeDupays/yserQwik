@@ -12,8 +12,10 @@ import {
 import registerStyle from './register.scss?inline'
 import { Form } from '@builder.io/qwik-city'
 import { minLength } from '@modular-forms/qwik'
-import { errorMsg } from '~/helpers/helpers'
+import { validateForm } from '~/helpers/helpers'
 import { HtmlStore, InputType, LabelType } from '~/models/inputForm'
+import { inscriptionService } from '~/services/auth'
+import { User, UserRegister } from '~/models/user'
 
 export default component$(() => {
    useStylesScoped$(registerStyle)
@@ -22,18 +24,18 @@ export default component$(() => {
 
    const fields = [
       {
-         inputName: 'prenom',
-         type: 'text',
+         inputName: 'username',
+         type: 'text' as InputType['type'],
          required: true,
          label: 'Prénom',
-         labelName: 'prenom',
+         labelName: 'username',
          labelClass: '',
          labelWidth: 0,
          transformLength: 0,
       },
       {
          inputName: 'nom',
-         type: 'text',
+         type: 'text' as InputType['type'],
          required: true,
          label: 'Nom',
          labelName: 'nom',
@@ -43,7 +45,7 @@ export default component$(() => {
       },
       {
          inputName: 'birthday',
-         type: 'date',
+         type: 'date' as InputType['type'],
          required: true,
          label: 'Date de naissance',
          labelName: 'birthday',
@@ -53,7 +55,7 @@ export default component$(() => {
       },
       {
          inputName: 'email',
-         type: 'email',
+         type: 'email' as InputType['type'],
          required: true,
          label: 'Email',
          labelName: 'email',
@@ -62,11 +64,31 @@ export default component$(() => {
          transformLength: 0,
       },
       {
-         inputName: 'phone_number',
-         type: 'tel',
+         inputName: 'password',
+         type: 'password' as InputType['type'],
+         required: true,
+         label: 'Mot de passe',
+         labelName: 'password',
+         labelClass: '',
+         labelWidth: 0,
+         transformLength: 0,
+      },
+      {
+         inputName: 'phone',
+         type: 'tel' as InputType['type'],
          required: true,
          label: 'Numéro de téléphone',
-         labelName: 'phone_number',
+         labelName: 'phone',
+         labelClass: '',
+         labelWidth: 0,
+         transformLength: 0,
+      },
+      {
+         inputName: 'ville',
+         type: 'text' as InputType['type'],
+         required: true,
+         label: 'Ville de résidence',
+         labelName: 'ville',
          labelClass: '',
          labelWidth: 0,
          transformLength: 0,
@@ -74,45 +96,8 @@ export default component$(() => {
    ]
 
    const useInputValueSignal = useSignal('')
-   const useErrorMsgWidthSignal = useSignal(0)
+   const isFormValidSignal = useSignal(false)
 
-   const createInput = $(
-      async (
-         inputName: string,
-         type: InputType['type'],
-         required: boolean
-      ): Promise<InputType> => {
-         const element = document.createElement('input')
-
-         element.type = type
-
-         const input: InputType = {
-            inputName,
-            element,
-            type,
-            required,
-            isFocused: false,
-         }
-
-         return input
-      }
-   )
-
-   const createLabel = $(
-      async (
-         labelId: string,
-         labelText: string,
-         labelName: string
-      ): Promise<LabelType> => {
-         const element = document.createElement('label')
-         element.textContent = labelText
-         const label: LabelType = { element, labelId, labelName }
-
-         label.element.htmlFor = labelId
-
-         return label
-      }
-   )
    interface AnimeLabelParams {
       translateLength: number
       color: string
@@ -144,7 +129,7 @@ export default component$(() => {
                   translateLength: 0,
                   color: 'green',
                })
-               errorMsg(
+               validateForm(
                   targetInput.inputType?.inputName!,
                   targetInput.inputType!.userCapture!,
                   storeHtml
@@ -156,9 +141,9 @@ export default component$(() => {
 
    const handleInputFocus = $((e: QwikFocusEvent) => {
       const targetName = (e.target as HTMLInputElement).name
-      console.log('targetname', targetName)
+
       const width = (e.target as HTMLInputElement).offsetWidth
-      console.log('width direct', width)
+
       const labelWidth = document.querySelector(
          `label[for="${targetName}"]`
       ) as HTMLLabelElement
@@ -170,10 +155,6 @@ export default component$(() => {
             labelType.labelWidth = labelWidth.offsetWidth
             labelType.transformLength =
                inputType?.inputWidth! - labelType.labelWidth!
-            console.log(
-               'FOCUS labelType.transformLength',
-               labelType.transformLength
-            )
 
             labelType.labelClass = await animeLabel({
                translateLength: labelType.transformLength,
@@ -205,43 +186,99 @@ export default component$(() => {
             translateLength: targetInput.labelType!.transformLength,
             color: 'green',
          })
-         errorMsg(targetName, targetInput.inputType!.userCapture!, storeHtml)
+         validateForm(
+            targetName,
+            targetInput.inputType!.userCapture!,
+            storeHtml
+         )
       }
    })
 
-   useTask$(({ track }) => {
-      const promises = fields.map(
-         async ({ inputName, type, required, label, labelName }) => {
-            const input = await createInput(
-               inputName,
-               type as InputType['type'],
-               required
-            )
-            const labelEl = await createLabel(`${label}`, label, labelName)
-
-            return { labelType: labelEl, inputType: input }
+   useTask$(async ({ track }) => {
+      fields.map(async ({ inputName, type, required, label, labelName }) => {
+         const input: InputType = {
+            inputName,
+            type,
+            required,
+            isFocused: false,
          }
-      )
 
-      Promise.all(promises).then((results) => {
-         results.forEach(({ labelType, inputType }) => {
-            storeHtml.push({ labelType, inputType })
-         })
+         const labelType: LabelType = {
+            labelId: label,
+            labelName,
+            labelText: label,
+         }
+
+         storeHtml.push({ labelType, inputType: input })
       })
    })
 
    useVisibleTask$(({ track }) => {
-      track(() => {
-         useInputValueSignal.value, useErrorMsgWidthSignal.value
+      track(() =>
+         storeHtml.find((e) => (isFormValidSignal.value = e.isFormValid!))
+      )
+      console.log('storeHtml track', storeHtml)
+   })
+
+   const inscription = $(() => {
+      const user: UserRegister = {
+         username: '',
+         email: '',
+         nom: '',
+         birthday: '',
+         ville: '',
+         phone: 0,
+         password: '',
+      }
+
+      storeHtml.forEach((e) => {
+         isFormValidSignal.value = e.isFormValid!
+
+         if (e.isFormValid!) {
+            if (e.isFormValid!) {
+               const inputName = e.inputType!.inputName
+               const userCapture = e.inputType!.userCapture
+
+               switch (inputName) {
+                  case 'username':
+                     user.username = userCapture!
+                     break
+                  case 'email':
+                     user.email = userCapture!
+                     break
+                  case 'phone':
+                     user.phone = parseInt(userCapture!)
+                     break
+                  case 'birthday':
+                     user.birthday = userCapture!
+                     break
+                  case 'nom':
+                     user.nom = userCapture!
+                     break
+                  case 'password':
+                     user.password = userCapture!
+                     break
+                  case 'ville':
+                     user.ville = userCapture!
+                     break
+
+                  default:
+                     break
+               }
+            }
+         }
       })
-      console.log(' useErrorMsgWidthSignal.value', useErrorMsgWidthSignal.value)
+
+      console.log('user', user)
+
+      inscriptionService(user)
    })
 
    return (
       <>
          <div class={'form-card'}>
             <header>
-               <h3>Votre profil</h3>
+               <h3>Votre inscription</h3>
             </header>
             <Form>
                <div class={'input-row'}>
@@ -276,7 +313,16 @@ export default component$(() => {
                      </div>
                   ))}
                </div>
-               <button type="submit">Enregistrer mes informations</button>
+               <footer class={'footer-form'}>
+                  <button
+                     type="submit"
+                     onClick$={inscription}
+                     disabled={isFormValidSignal.value === false}
+                     class={isFormValidSignal.value === false ? 'disabled' : ''}
+                  >
+                     Enregistrer mes informations
+                  </button>
+               </footer>
             </Form>
          </div>
       </>

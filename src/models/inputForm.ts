@@ -1,7 +1,7 @@
 export interface InputType {
    inputName: string
-   element: HTMLInputElement
-   type: 'tel' | 'date' | 'text' | 'email'
+   element?: HTMLInputElement
+   type: 'tel' | 'date' | 'text' | 'email' | 'password'
    inputWidth?: number
    minLength?: number
    maxlength?: number
@@ -10,9 +10,10 @@ export interface InputType {
    isFocused: boolean
 }
 export interface LabelType {
-   element: HTMLLabelElement
+   element?: HTMLLabelElement
    labelId: string
    labelName: string
+   labelText: string
    labelClass?: string
    labelWidth?: number
    errorSpanWidth?: number
@@ -22,4 +23,5 @@ export interface HtmlStore {
    labelType?: LabelType
    inputType?: InputType
    errorMessage?: string
+   isFormValid?: boolean
 }
