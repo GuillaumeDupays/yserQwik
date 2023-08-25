@@ -54,6 +54,26 @@ export default component$(() => {
          transformLength: 0,
       },
       {
+         inputName: 'ville',
+         type: 'text' as InputType['type'],
+         required: true,
+         label: 'Ville de résidence',
+         labelName: 'ville',
+         labelClass: '',
+         labelWidth: 0,
+         transformLength: 0,
+      },
+      {
+         inputName: 'phone',
+         type: 'tel' as InputType['type'],
+         required: true,
+         label: 'Numéro de téléphone',
+         labelName: 'phone',
+         labelClass: '',
+         labelWidth: 0,
+         transformLength: 0,
+      },
+      {
          inputName: 'email',
          type: 'email' as InputType['type'],
          required: true,
@@ -73,27 +93,10 @@ export default component$(() => {
          labelWidth: 0,
          transformLength: 0,
       },
-      {
-         inputName: 'phone',
-         type: 'tel' as InputType['type'],
-         required: true,
-         label: 'Numéro de téléphone',
-         labelName: 'phone',
-         labelClass: '',
-         labelWidth: 0,
-         transformLength: 0,
-      },
-      {
-         inputName: 'ville',
-         type: 'text' as InputType['type'],
-         required: true,
-         label: 'Ville de résidence',
-         labelName: 'ville',
-         labelClass: '',
-         labelWidth: 0,
-         transformLength: 0,
-      },
    ]
+
+   const stepOneFields = fields.slice(0, 4)
+   const stepTwoFields = fields.slice(4)
 
    const useInputValueSignal = useSignal('')
    const isFormValidSignal = useSignal(false)
@@ -172,12 +175,10 @@ export default component$(() => {
 
    const handleInputBlur = $(async (blurEvent: QwikFocusEvent) => {
       const targetName = (blurEvent.target as HTMLInputElement).name
-      console.log('targetname', targetName)
 
       const targetInput = storeHtml.find(
          (e) => targetName === e.inputType!.inputName!
       )
-      console.log('targetInput', targetInput)
 
       if (targetInput) {
          targetInput.inputType!.isFocused = false
@@ -221,7 +222,6 @@ export default component$(() => {
                : (isFormValidSignal.value = false)
          )
       )
-      console.log('storeHtml track', storeHtml)
    })
 
    const inscription = $(() => {
@@ -273,14 +273,25 @@ export default component$(() => {
          }
       })
 
-      console.log('user', user)
-
       inscriptionService(user)
    })
 
    const alignmentConfig = {
       alignedInputs: ['username', 'nom'], // Ajoutez les noms d'input que vous voulez aligner ici
    }
+
+   const currentStep = useSignal('stepOne') // Initially set to 'stepOne'
+
+   const handleNextStep = $(() => {
+      currentStep.value = 'stepTwo'
+   })
+   const handlePreviousStep = $(() => {
+      currentStep.value = 'stepOne'
+   })
+
+   const handleSave = $(() => {
+      // Handle save logic here
+   })
 
    return (
       <div class={'form-card'}>
@@ -289,46 +300,123 @@ export default component$(() => {
          </header>
          <Form>
             <div class={'input-row'}>
-               {storeHtml.map((item, i) => (
-                  <div class={'input-group'} key={i}>
-                     <label
-                        id={item.labelType?.labelId}
-                        for={item.labelType?.labelName}
-                        style={item.labelType?.labelClass}
-                     >
-                        {item.errorMessage ? (
-                           <span class="error-message">
-                              {item.errorMessage}
-                           </span>
-                        ) : (
-                           item.labelType?.labelId
-                        )}
-                     </label>
-                     <input
-                        type={item.inputType?.type}
-                        name={item.inputType?.inputName}
-                        class={'input-form'}
-                        placeholder={
-                           item.errorMessage ? item.labelType?.labelId : ''
-                        }
-                        required={true}
-                        onInput$={(e: InputEvent) => isValidInput(e)}
-                        onFocus$={(e: QwikFocusEvent) => handleInputFocus(e)}
-                        onBlur$={(e: QwikFocusEvent) => handleInputBlur(e)}
-                        max={new Date().toISOString().split('T')[0]}
-                     />
-                  </div>
-               ))}
+               {storeHtml.map((item, i) => {
+                  if (
+                     currentStep.value === 'stepOne' &&
+                     stepOneFields.some(
+                        (field) => field.inputName === item.inputType?.inputName
+                     )
+                  ) {
+                     return (
+                        <div class={'input-group'} key={i}>
+                           <label
+                              id={item.labelType?.labelId}
+                              for={item.inputType?.inputName}
+                              style={item.labelType?.labelClass}
+                           >
+                              {item.errorMessage ? (
+                                 <span class="error-message">
+                                    {item.errorMessage}
+                                 </span>
+                              ) : (
+                                 item.labelType?.labelId
+                              )}
+                           </label>
+                           <input
+                              type={item.inputType?.type}
+                              id={item.inputType?.inputName}
+                              name={item.inputType?.inputName}
+                              class={'input-form'}
+                              placeholder={
+                                 item.errorMessage
+                                    ? item.labelType?.labelId
+                                    : ''
+                              }
+                              required={true}
+                              onInput$={(e: InputEvent) => isValidInput(e)}
+                              onFocus$={(e: QwikFocusEvent) =>
+                                 handleInputFocus(e)
+                              }
+                              onBlur$={(e: QwikFocusEvent) =>
+                                 handleInputBlur(e)
+                              }
+                              max={new Date().toISOString().split('T')[0]}
+                           />
+                        </div>
+                     )
+                  }
+               })}
+            </div>
+            <div class={'input-row'}>
+               {storeHtml.map((item, i) => {
+                  if (
+                     currentStep.value === 'stepTwo' &&
+                     stepTwoFields.some(
+                        (field) => field.inputName === item.inputType?.inputName
+                     )
+                  ) {
+                     return (
+                        <div class={'input-group'} key={i}>
+                           <label
+                              id={item.labelType?.labelId}
+                              for={item.inputType?.inputName}
+                              style={item.labelType?.labelClass}
+                           >
+                              {item.errorMessage ? (
+                                 <span class="error-message">
+                                    {item.errorMessage}
+                                 </span>
+                              ) : (
+                                 item.labelType?.labelId
+                              )}
+                           </label>
+                           <input
+                              type={item.inputType?.type}
+                              id={item.inputType?.inputName}
+                              name={item.inputType?.inputName}
+                              class={'input-form'}
+                              placeholder={
+                                 item.errorMessage
+                                    ? item.labelType?.labelId
+                                    : ''
+                              }
+                              required={true}
+                              onInput$={(e: InputEvent) => isValidInput(e)}
+                              onFocus$={(e: QwikFocusEvent) =>
+                                 handleInputFocus(e)
+                              }
+                              onBlur$={(e: QwikFocusEvent) =>
+                                 handleInputBlur(e)
+                              }
+                              max={new Date().toISOString().split('T')[0]}
+                           />
+                        </div>
+                     )
+                  }
+               })}
             </div>
             <footer class={'footer-form'}>
-               <button
-                  type="submit"
-                  onClick$={inscription}
-                  disabled={isFormValidSignal.value === false}
-                  class={isFormValidSignal.value === false ? 'disabled' : ''}
-               >
-                  Enregistrer mes informations
-               </button>
+               {currentStep.value === 'stepOne' ? (
+                  <button type="button" onClick$={handleNextStep}>
+                     Suivant
+                  </button>
+               ) : (
+                  <>
+                     <button type="button" onClick$={handlePreviousStep}>
+                        Précédent
+                     </button>
+                     <button
+                        type="submit"
+                        onClick$={handleSave}
+                        disabled={isFormValidSignal.value === false}
+                        class={
+                           isFormValidSignal.value === false ? 'disabled' : ''
+                        }
+                     >
+                        Valider
+                     </button>
+                  </>
+               )}
             </footer>
          </Form>
       </div>

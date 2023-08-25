@@ -167,6 +167,7 @@ export default component$(() => {
             {!isRegister.value && userCtxt.user.blocked && (
                <Form action={action} spaReset={true}>
                   <h3>Connexion</h3>
+                  <span>{storeErrorMessages['identifier']}</span>
                   <input
                      type="email"
                      name="identifier"
@@ -174,7 +175,7 @@ export default component$(() => {
                      placeholder="Email"
                      onInput$={handleInputEmail}
                   />
-                  <span>{storeErrorMessages['identifier']}</span>
+                  <span>{storeErrorMessages['password']}</span>
                   <input
                      type="password"
                      name="password"
@@ -182,7 +183,6 @@ export default component$(() => {
                      placeholder="Mot de passe"
                      onInput$={handleInputPassword}
                   />
-                  <span>{storeErrorMessages['password']}</span>
                   {userCtxt.user.blocked && (
                      <div class={'box-footer-form'}>
                         <button type="submit" onClick$={handleSubmit}>
@@ -200,7 +200,10 @@ export default component$(() => {
             )}
             {isRegister.value && <Link href="/inscription">S'inscrire</Link>}
             {/* {isRegister.value && <Registrer></Registrer>} */}
-            <p>{storeErrorMessages.connectionError}</p>
+            {storeErrorMessages.connectionError && (
+               <p>{storeErrorMessages.connectionError}</p>
+            )}
+
             {!userCtxt.user.blocked && (
                <div>
                   {userInfoSet.getUserInfos().then((res) => (

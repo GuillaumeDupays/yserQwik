@@ -5,6 +5,23 @@
  * the styles in here will be applied to the Document, without any sort of CSS scoping.
  *
  */
+@mixin media-query($breakpoint) {
+   @if $breakpoint == smartphone {
+      @media (max-width: 767px) {
+         @content;
+      }
+   }
+   @if $breakpoint == tablet {
+      @media (min-width: 768px) and (max-width: 1023px) {
+         @content;
+      }
+   } @else if $breakpoint == desktop {
+      @media (min-width: 1024px) {
+         @content;
+      }
+   }
+}
+
 html {
    -webkit-text-size-adjust: 100%;
    -moz-tab-size: 4;
@@ -20,7 +37,16 @@ body {
    padding: 0;
    line-height: inherit;
    margin: 0;
-   /* overflow: hidden; */
+   @include media-query(smartphone) {
+      font-size: smaller;
+   }
+   @include media-query(tablet) {
+      font-size: large;
+   }
+
+   @include media-query(desktop) {
+      font-size: large;
+   }
 }
 
 button {
