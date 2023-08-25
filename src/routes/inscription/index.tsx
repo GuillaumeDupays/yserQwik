@@ -6,7 +6,11 @@ import Header from '~/components/header/header'
 
 export default component$(() => {
    return (
-      <div>
+      <div
+         style={`height: 100vh;
+    display: flex;
+    flex-direction: column;`}
+      >
          <Header></Header>
          <Registrer></Registrer>
       </div>

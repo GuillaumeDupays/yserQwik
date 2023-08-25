@@ -164,7 +164,7 @@ export default component$(() => {
             inputType!.isFocused = false
             labelType!.labelClass = await animeLabel({
                translateLength: 0,
-               color: 'blue',
+               color: 'black',
             })
          }
       })
@@ -215,7 +215,11 @@ export default component$(() => {
 
    useVisibleTask$(({ track }) => {
       track(() =>
-         storeHtml.find((e) => (isFormValidSignal.value = e.isFormValid!))
+         storeHtml.find((e) =>
+            e.isFormValid!
+               ? (isFormValidSignal.value = e.isFormValid)
+               : (isFormValidSignal.value = false)
+         )
       )
       console.log('storeHtml track', storeHtml)
    })
@@ -274,57 +278,59 @@ export default component$(() => {
       inscriptionService(user)
    })
 
+   const alignmentConfig = {
+      alignedInputs: ['username', 'nom'], // Ajoutez les noms d'input que vous voulez aligner ici
+   }
+
    return (
-      <>
-         <div class={'form-card'}>
-            <header>
-               <h3>Votre inscription</h3>
-            </header>
-            <Form>
-               <div class={'input-row'}>
-                  {storeHtml.map((item, i) => (
-                     <div class={'input-group'} key={i}>
-                        <label
-                           id={item.labelType?.labelId}
-                           for={item.labelType?.labelName}
-                           style={item.labelType?.labelClass}
-                        >
-                           {item.errorMessage ? (
-                              <span class="error-message">
-                                 {item.errorMessage}
-                              </span>
-                           ) : (
-                              item.labelType?.labelId
-                           )}
-                        </label>
-                        <input
-                           type={item.inputType?.type}
-                           name={item.inputType?.inputName}
-                           class={'input-form'}
-                           placeholder={
-                              item.errorMessage ? item.labelType?.labelId : ''
-                           }
-                           required={true}
-                           onInput$={(e: InputEvent) => isValidInput(e)}
-                           onFocus$={(e: QwikFocusEvent) => handleInputFocus(e)}
-                           onBlur$={(e: QwikFocusEvent) => handleInputBlur(e)}
-                           max={new Date().toISOString().split('T')[0]}
-                        />
-                     </div>
-                  ))}
-               </div>
-               <footer class={'footer-form'}>
-                  <button
-                     type="submit"
-                     onClick$={inscription}
-                     disabled={isFormValidSignal.value === false}
-                     class={isFormValidSignal.value === false ? 'disabled' : ''}
-                  >
-                     Enregistrer mes informations
-                  </button>
-               </footer>
-            </Form>
-         </div>
-      </>
+      <div class={'form-card'}>
+         <header>
+            <h3>Votre inscription</h3>
+         </header>
+         <Form>
+            <div class={'input-row'}>
+               {storeHtml.map((item, i) => (
+                  <div class={'input-group'} key={i}>
+                     <label
+                        id={item.labelType?.labelId}
+                        for={item.labelType?.labelName}
+                        style={item.labelType?.labelClass}
+                     >
+                        {item.errorMessage ? (
+                           <span class="error-message">
+                              {item.errorMessage}
+                           </span>
+                        ) : (
+                           item.labelType?.labelId
+                        )}
+                     </label>
+                     <input
+                        type={item.inputType?.type}
+                        name={item.inputType?.inputName}
+                        class={'input-form'}
+                        placeholder={
+                           item.errorMessage ? item.labelType?.labelId : ''
+                        }
+                        required={true}
+                        onInput$={(e: InputEvent) => isValidInput(e)}
+                        onFocus$={(e: QwikFocusEvent) => handleInputFocus(e)}
+                        onBlur$={(e: QwikFocusEvent) => handleInputBlur(e)}
+                        max={new Date().toISOString().split('T')[0]}
+                     />
+                  </div>
+               ))}
+            </div>
+            <footer class={'footer-form'}>
+               <button
+                  type="submit"
+                  onClick$={inscription}
+                  disabled={isFormValidSignal.value === false}
+                  class={isFormValidSignal.value === false ? 'disabled' : ''}
+               >
+                  Enregistrer mes informations
+               </button>
+            </footer>
+         </Form>
+      </div>
    )
 })

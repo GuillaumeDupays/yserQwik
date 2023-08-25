@@ -28,14 +28,20 @@ export default component$(() => {
    return (
       <>
          <header>
-            <ul>
-               <Link href="/projets">PROJETS</Link>
+            <ul class={'animated-link '}>
+               <Link href="/projets" style={'text-decoration: none'}>
+                  PROJETS
+               </Link>
             </ul>
-            <ul>
-               <Link href="/reservation">Réserver un créneau</Link>
+            <ul class={'animated-link '}>
+               <Link href="/reservation" style={'text-decoration: none'}>
+                  Réserver un créneau
+               </Link>
             </ul>
-            <ul>
-               <Link href="/login">{userConnected()}</Link>
+            <ul class={'animated-link '}>
+               <Link href="/login" style={'text-decoration: none'}>
+                  {userConnected()}
+               </Link>
             </ul>
          </header>
       </>

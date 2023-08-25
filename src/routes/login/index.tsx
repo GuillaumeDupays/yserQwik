@@ -7,7 +7,11 @@ import Header from '~/components/header/header'
 
 export default component$(() => {
    return (
-      <div>
+      <div
+         style={`height: calc(100vh - 53px);
+    display: flex;
+    flex-direction: column;`}
+      >
          <Header></Header>
          <Account></Account>
       </div>

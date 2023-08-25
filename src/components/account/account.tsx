@@ -166,6 +166,7 @@ export default component$(() => {
          <div class="container container-center">
             {!isRegister.value && userCtxt.user.blocked && (
                <Form action={action} spaReset={true}>
+                  <h3>Connexion</h3>
                   <input
                      type="email"
                      name="identifier"

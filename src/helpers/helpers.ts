@@ -107,7 +107,7 @@ export const convertDateFormatToBack = (inputDate: string) => {
 }
 
 export function validatePassword(pwd: string) {
-   if (pwd.length >= 8 && pwd.length <= 25) {
+   if (pwd && pwd.length >= 8 && pwd.length <= 25) {
       return true
    }
    return false
