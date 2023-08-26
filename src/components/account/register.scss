@@ -25,6 +25,16 @@ h3 {
    margin: auto;
 }
 
+.card-shadow {
+   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+   transition: box-shadow 0.3s ease-in-out;
+}
+
+.card-shadow-active {
+   box-shadow: 0 0 20px rgba(37, 143, 249, 0.352);
+   transition: box-shadow 0.3s ease-in-out;
+}
+
 .disabled {
    background-color: grey;
 }
@@ -84,4 +94,20 @@ h3 {
 button {
    width: 100%;
    margin: 2%;
+}
+
+.button-animation {
+   animation: buttonAnimation 0.3s ease-in-out;
+}
+
+@keyframes buttonAnimation {
+   0% {
+      transform: scale(1);
+   }
+   50% {
+      transform: scale(1.05);
+   }
+   100% {
+      transform: scale(1);
+   }
 }

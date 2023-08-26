@@ -138,6 +138,7 @@ export const validateForm = (
          const isEmailValid = validateEmail(capture)
          targetInput.errorMessage = !isEmailValid ? 'Email invalide*' : ''
          targetInput.inputType.userCapture = isEmailValid ? capture : ''
+         targetInput.isFormValid = isEmailValid
          break
 
       case 'tel':
@@ -146,6 +147,8 @@ export const validateForm = (
             ? 'N° de téléphone invalide*'
             : ''
          targetInput.inputType.userCapture = isTelValid ? capture : ''
+         targetInput.isFormValid = isTelValid
+
          break
 
       case 'date':
@@ -153,29 +156,26 @@ export const validateForm = (
          const isAgeValid = isUserOfLegalAge(birthdate)
          targetInput.errorMessage = isAgeValid ? '' : 'Vous devez être majeur*'
          targetInput.inputType.userCapture = isAgeValid ? capture : ''
+         targetInput.isFormValid = isAgeValid
+
          break
       case 'password':
          const isValidPwd = validatePassword(capture)
          targetInput.errorMessage = isValidPwd ? '' : 'Mot de passe non valide*'
          targetInput.inputType.userCapture = isValidPwd ? capture : ''
+         targetInput.isFormValid = isValidPwd
+
          break
       case 'text':
          const isTextNotValid = !capture
          targetInput.errorMessage = isTextNotValid ? 'Champ requis*' : ''
-
+         targetInput.isFormValid = !isTextNotValid ? true : false
          break
 
       default:
          console.error(`Unsupported input type '${targetInput}'.`)
          break
    }
-   // Après avoir validé le champ actuel, vérifions si tous les champs sont valides
-   const allFieldsValid = store.every((input) => input.errorMessage === '')
-
-   // Mettre à jour la valeur isFormValid dans chaque élément HtmlStore
-   store.forEach((input) => {
-      input.isFormValid = allFieldsValid
-   })
 }
 
 export function useStoreUser() {

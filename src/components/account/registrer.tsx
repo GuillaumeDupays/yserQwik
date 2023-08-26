@@ -98,7 +98,6 @@ export default component$(() => {
    const stepOneFields = fields.slice(0, 4)
    const stepTwoFields = fields.slice(4)
 
-   const useInputValueSignal = useSignal('')
    const isFormValidSignal = useSignal(false)
 
    interface AnimeLabelParams {
@@ -113,31 +112,42 @@ export default component$(() => {
       return animation
    })
 
+   const currentStep = useSignal('stepOne') // Initially set to 'stepOne'
+   const isFieldsValids = (step: any) => {
+      return step!.every(({ inputName }: InputType) => {
+         const item = storeHtml.find(
+            (item) => item.inputType!.inputName === inputName
+         )
+         return item && item.isFormValid === true
+      })
+   }
+
    const isValidInput = $(async (inputValue: InputEvent) => {
-      const capture = (inputValue.target as HTMLInputElement).value
-      const inputName = (inputValue.target as HTMLInputElement).name
+      const inputElement = inputValue.target as HTMLInputElement
+      const capture = inputElement.value
+      const inputName = inputElement.name
       const targetInput = storeHtml.find(
-         (e) => inputName === e.inputType!.inputName
+         (e) => e.inputType?.inputName === inputName
       )
+
       const errorMessageSpan = document.querySelector(
          `label .error-message`
       ) as HTMLSpanElement
 
       if (targetInput) {
-         useInputValueSignal.value = capture
-         targetInput.inputType!.userCapture = useInputValueSignal.value
-         if (useInputValueSignal.value) {
-            if (errorMessageSpan) {
-               targetInput.labelType!.labelClass = await animeLabel({
-                  translateLength: 0,
-                  color: 'green',
-               })
-               validateForm(
-                  targetInput.inputType?.inputName!,
-                  targetInput.inputType!.userCapture!,
-                  storeHtml
-               )
-            }
+         targetInput.inputType!.userCapture = capture
+
+         if (capture && errorMessageSpan) {
+            targetInput.labelType!.labelClass = await animeLabel({
+               translateLength: 0,
+               color: 'green',
+            })
+
+            validateForm(
+               targetInput.inputType?.inputName!,
+               targetInput.inputType!.userCapture!,
+               storeHtml
+            )
          }
       }
    })
@@ -280,21 +290,24 @@ export default component$(() => {
       alignedInputs: ['username', 'nom'], // Ajoutez les noms d'input que vous voulez aligner ici
    }
 
-   const currentStep = useSignal('stepOne') // Initially set to 'stepOne'
-
    const handleNextStep = $(() => {
       currentStep.value = 'stepTwo'
-   })
-   const handlePreviousStep = $(() => {
-      currentStep.value = 'stepOne'
    })
 
    const handleSave = $(() => {
       // Handle save logic here
    })
 
+   const isStepOneValid =
+      currentStep.value === 'stepOne' && isFieldsValids(stepOneFields)
+   const isStepTwoValid =
+      currentStep.value === 'stepTwo' && isFieldsValids(stepTwoFields)
+
+   const cardShadowClass =
+      isStepOneValid || isStepTwoValid ? 'card-shadow-active' : 'card-shadow'
+
    return (
-      <div class={'form-card'}>
+      <div class={`form-card ${cardShadowClass}`}>
          <header>
             <h3>Votre inscription</h3>
          </header>
@@ -397,20 +410,28 @@ export default component$(() => {
             </div>
             <footer class={'footer-form'}>
                {currentStep.value === 'stepOne' ? (
-                  <button type="button" onClick$={handleNextStep}>
+                  <button
+                     type="button"
+                     onClick$={handleNextStep}
+                     disabled={!isFieldsValids(stepOneFields)}
+                     class={`${
+                        !isFieldsValids(stepOneFields)
+                           ? 'disabled'
+                           : 'button-animation'
+                     }`}
+                  >
                      Suivant
                   </button>
                ) : (
                   <>
-                     <button type="button" onClick$={handlePreviousStep}>
-                        Précédent
-                     </button>
                      <button
                         type="submit"
                         onClick$={handleSave}
-                        disabled={isFormValidSignal.value === false}
+                        disabled={!isFieldsValids(stepTwoFields)}
                         class={
-                           isFormValidSignal.value === false ? 'disabled' : ''
+                           !isFieldsValids(stepTwoFields)
+                              ? 'disabled'
+                              : 'button-animation'
                         }
                      >
                         Valider
