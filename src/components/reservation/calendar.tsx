@@ -20,6 +20,7 @@ import { routeLoader$ } from '@builder.io/qwik-city'
 import {
    deleteReservation,
    getReservations,
+   getUserReservations,
    postReservation,
 } from '~/services/reservation'
 import { Reservation } from '~/models/reservation'
@@ -30,17 +31,22 @@ export default component$(() => {
    const getAllReservations = useResource$<Reservation[]>(async () => {
       try {
          const reservations = await getReservations()
-         const formattedCreneau = reservations.map((e) => {
-            const obj = {
+         const userReservations = await getUserReservations()
+         console.log('userResa', userReservations)
+
+         const formattedCreneau = reservations
+            .filter((e) =>
+               userReservations.some((userResa) => userResa.id === e.id)
+            )
+            .map((e) => ({
                id: e.id,
                attributes: {
                   creneau: formatDate(e.attributes.creneau),
                   isAvailable: e.attributes.isAvailable,
                   projectDescription: e.attributes.projectDescription,
                },
-            }
-            return obj
-         })
+            }))
+
          return formattedCreneau
       } catch (error) {
          console.error("Une erreur s'est produite:", error)
@@ -50,6 +56,7 @@ export default component$(() => {
 
    const stateReservation = useStore({
       reservations: [] as Reservation[],
+      userReservations: [] as Reservation[],
    })
 
    // Appel de la fonction de récupération des réservations

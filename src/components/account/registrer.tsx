@@ -7,15 +7,17 @@ import {
    useVisibleTask$,
    useTask$,
    useSignal,
+   useContext,
 } from '@builder.io/qwik'
 
 import registerStyle from './register.scss?inline'
-import { Form } from '@builder.io/qwik-city'
+import { Form, useNavigate } from '@builder.io/qwik-city'
 import { minLength } from '@modular-forms/qwik'
-import { validateForm } from '~/helpers/helpers'
+import { useStoreUser, validateForm } from '~/helpers/helpers'
 import { HtmlStore, InputType, LabelType } from '~/models/inputForm'
-import { inscriptionService } from '~/services/auth'
+import { inscriptionService, useTattooService } from '~/services/auth'
 import { User, UserRegister } from '~/models/user'
+import { UserSessionCtxt } from '~/routes/layout'
 
 export default component$(() => {
    useStylesScoped$(registerStyle)
@@ -97,7 +99,7 @@ export default component$(() => {
 
    const stepOneFields = fields.slice(0, 4)
    const stepTwoFields = fields.slice(4)
-
+   const userCtxt = useContext(UserSessionCtxt)
    const isFormValidSignal = useSignal(false)
 
    interface AnimeLabelParams {
@@ -223,18 +225,23 @@ export default component$(() => {
          storeHtml.push({ labelType, inputType: input })
       })
    })
-
+   const nav = useNavigate()
+   const userInfoSet = useStoreUser()
    useVisibleTask$(({ track }) => {
-      track(() =>
+      track(() => {
          storeHtml.find((e) =>
             e.isFormValid!
                ? (isFormValidSignal.value = e.isFormValid)
                : (isFormValidSignal.value = false)
          )
-      )
+         userCtxt
+      })
+      console.log('userCtxt', userCtxt)
+      if (!userCtxt.connect?.blocked) {
+         nav('/')
+      }
    })
-
-   const inscription = $(() => {
+   const inscription = $(async () => {
       const user: UserRegister = {
          username: '',
          email: '',
@@ -284,11 +291,19 @@ export default component$(() => {
       })
 
       inscriptionService(user)
-   })
 
-   const alignmentConfig = {
-      alignedInputs: ['username', 'nom'], // Ajoutez les noms d'input que vous voulez aligner ici
-   }
+      const login = {
+         identifier: user.username,
+         password: user.password,
+      }
+      const response = await useTattooService(login)
+      if (response) {
+         console.log('response', response)
+         userInfoSet.setUserInfos(response.user)
+         userCtxt.connect!.blocked = false
+         await nav('/')
+      }
+   })
 
    const handleNextStep = $(() => {
       currentStep.value = 'stepTwo'
@@ -426,7 +441,7 @@ export default component$(() => {
                   <>
                      <button
                         type="submit"
-                        onClick$={handleSave}
+                        onClick$={inscription}
                         disabled={!isFieldsValids(stepTwoFields)}
                         class={
                            !isFieldsValids(stepTwoFields)

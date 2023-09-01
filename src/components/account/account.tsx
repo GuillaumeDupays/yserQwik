@@ -14,6 +14,7 @@ import { Form, Link, routeAction$, useNavigate } from '@builder.io/qwik-city'
 import styleLogin from '../account/login.scss?inline'
 import {
    UserInfo,
+   formatDate,
    isEqualString,
    removeToken,
    useStoreUser,
@@ -24,6 +25,8 @@ import { reset } from '@modular-forms/qwik'
 import { useTattooService } from '~/services/auth'
 import { UserSessionCtxt } from '~/routes/layout'
 import Registrer from './registrer'
+import { User, UserConnect } from '~/models/user'
+import InfosUser from '../infosUser/infosUser'
 
 interface LoginForm {
    identifier: string
@@ -117,8 +120,10 @@ export default component$(() => {
             })
 
             if (response) {
-               userInfoSet.setUserInfos(response)
-               userCtxt.user.blocked = false
+               console.log('response', response)
+
+               userInfoSet.setUserInfos(response.user)
+               userCtxt.connect!.blocked = false
                storeFormData.identifier = ''
                storeFormData.password = ''
                storeErrorMessages.connectionError = ''
@@ -141,12 +146,17 @@ export default component$(() => {
 
    const logout = $(() => {
       const storage = localStorage.getItem('authToken')
-      let deleteUser: UserInfo = {
-         jwt: '',
-         user: {
-            id: -1,
-            username: 'anonyme',
-            email: 'non',
+      let deleteUser: User = {
+         connect: {
+            infos: {
+               username: '',
+               email: '',
+               nom: '',
+               birthday: '',
+               ville: '',
+               phone: 0,
+               password: '',
+            },
             provider: '',
             confirmed: false,
             blocked: true,
@@ -156,7 +166,9 @@ export default component$(() => {
       }
       if (storage !== '') {
          removeToken()
-         userCtxt.user = deleteUser.user
+         userCtxt.connect = deleteUser.connect
+         userCtxt.login = deleteUser.login
+         userCtxt.register = deleteUser.register
          console.log('userctxt after remove', userCtxt)
       }
    })
@@ -164,7 +176,7 @@ export default component$(() => {
    return (
       <>
          <div class="container container-center">
-            {!isRegister.value && userCtxt.user.blocked && (
+            {!isRegister.value && userCtxt.connect!.blocked && (
                <Form action={action} spaReset={true}>
                   <h3>Connexion</h3>
                   <span>{storeErrorMessages['identifier']}</span>
@@ -183,18 +195,25 @@ export default component$(() => {
                      placeholder="Mot de passe"
                      onInput$={handleInputPassword}
                   />
-                  {userCtxt.user.blocked && (
-                     <div class={'box-footer-form'}>
-                        <button type="submit" onClick$={handleSubmit}>
-                           Connexion
-                        </button>
-                        <button
-                           onClick$={() => handleRegister()}
-                           preventdefault:click
-                        >
-                           S'inscrire
-                        </button>
-                     </div>
+                  {userCtxt.connect!.blocked && (
+                     <>
+                        <div class={'box-footer-form'}>
+                           <button type="submit" onClick$={handleSubmit}>
+                              Connexion
+                           </button>
+                           <button
+                              onClick$={() => handleRegister()}
+                              preventdefault:click
+                           >
+                              S'inscrire
+                           </button>
+                        </div>
+                        <ul class={'forgot-pwd'}>
+                           <Link href="/forgot-pwd/">
+                              Mot de passe oublié ?
+                           </Link>
+                        </ul>
+                     </>
                   )}
                </Form>
             )}
@@ -204,20 +223,52 @@ export default component$(() => {
                <p>{storeErrorMessages.connectionError}</p>
             )}
 
-            {!userCtxt.user.blocked && (
-               <div>
-                  {userInfoSet.getUserInfos().then((res) => (
-                     <>
-                        <p>
-                           Utilisateur : {res.username} - Email : {res.email}
-                        </p>
-                        <p> usercontexte : {userCtxt.user.email}</p>
-                        <button type="submit" onClick$={logout}>
-                           Se déconnecter
-                        </button>
-                     </>
-                  ))}
-               </div>
+            {!userCtxt.connect!.blocked && (
+               <>
+                  <section>
+                     <InfosUser></InfosUser>
+                     {userInfoSet.getUserInfos().then((item) => (
+                        <>
+                           <p>
+                              <label>Nom :</label>
+                              <span> {item!.connect!.infos!.username}</span>
+                           </p>
+                           <p>
+                              <label>Prénom :</label>{' '}
+                              <span>{item.connect?.infos.nom}</span>
+                           </p>
+                           <p>
+                              <label>Date de naissance :</label>{' '}
+                              <span>
+                                 {formatDate(item.connect?.infos.birthday!)}
+                              </span>
+                           </p>
+                           <p>
+                              <label>Ville :</label>
+                              <span> {item.connect?.infos.ville}</span>
+                           </p>
+                           <p>
+                              <label>N° de téléphone :</label>{' '}
+                              <span>{item.connect?.infos.phone}</span>
+                           </p>
+                           <p>
+                              <label>Email : </label>
+                              <span>{item?.connect!.infos?.email}</span>
+                           </p>
+                           <p>
+                              {' '}
+                              {/* usercontexte : {userCtxt.connect?.infos?.username} */}
+                           </p>
+                           <button type="submit" onClick$={logout}>
+                              Se déconnecter
+                           </button>
+                        </>
+                     ))}
+                  </section>
+                  <section>
+                     <h3>Vos prochains rendez-vous</h3>
+                  </section>
+               </>
             )}
          </div>
       </>

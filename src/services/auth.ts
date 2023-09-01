@@ -1,4 +1,4 @@
-import { User, UserLogin, UserRegister } from '~/models/user'
+import { Login, User, UserRegister } from '~/models/user'
 import { $, component$, useResource$ } from '@builder.io/qwik'
 import {
    RequestHandler,
@@ -12,7 +12,7 @@ import {
    useStoreUser,
 } from '~/helpers/helpers'
 
-export const useTattooService = async (payload: UserLogin) => {
+export const useTattooService = async (payload: Login) => {
    console.log('payload', payload)
 
    try {
@@ -37,6 +37,55 @@ export const useTattooService = async (payload: UserLogin) => {
       throw error
    }
 }
+const apiResetPwd = 'http://localhost:1337/api/auth/reset-password'
+export const resetPwdService = (newPwd: Login) => {
+   const email = {
+      code: newPwd.code,
+      password: newPwd.password,
+      passwordConfirmation: newPwd.password,
+   }
+
+   console.log('newPwd', email)
+
+   fetch(apiResetPwd, {
+      method: 'POST',
+      headers: {
+         'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(email),
+   })
+      .then((response) => {
+         if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`)
+         }
+         console.log('Votre utilisateur a reçu un e-mail')
+      })
+      .catch((error) => {
+         console.log("Une erreur s'est produite :", error)
+      })
+}
+export const forgotPwdService = (email: Login) => {
+   // const email = { email: 'guillaumedupays@gmail.com' }
+   console.log('email', email)
+   const url = 'http://localhost:1337/api/auth/forgot-password'
+
+   fetch(url, {
+      method: 'POST',
+      headers: {
+         'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(email),
+   })
+      .then((response) => {
+         if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`)
+         }
+         console.log('Votre utilisateur a reçu un e-mail')
+      })
+      .catch((error) => {
+         console.log("Une erreur s'est produite :", error)
+      })
+}
 
 export const inscriptionService = async (user: UserRegister) => {
    console.log('user', user)
@@ -59,7 +108,8 @@ export const inscriptionService = async (user: UserRegister) => {
       }
 
       const data = await response.json()
-      setToken(data.jwt) // Assurez-vous que setToken est correctement défini et accessible ici
+      // setToken(data.jwt) // Assurez-vous que setToken est correctement défini et accessible ici
+
       return data
    } catch (error) {
       console.error('Error:', error)

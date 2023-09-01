@@ -7,6 +7,8 @@ import {
 import { RouterHead } from './components/router-head/router-head'
 
 import './global.scss'
+import Menu from './components/menu/menu'
+import Header from './components/header/header'
 
 export default component$(() => {
    /**
@@ -21,7 +23,7 @@ export default component$(() => {
          <head>
             <meta charSet="utf-8" />
             <link rel="manifest" href="/manifest.json" />
-            <RouterHead />
+            <RouterHead></RouterHead>
          </head>
          <body lang="en">
             <RouterOutlet />

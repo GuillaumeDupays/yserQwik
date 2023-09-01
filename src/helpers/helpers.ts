@@ -7,6 +7,7 @@ import {
 } from '@builder.io/qwik'
 import { InputType } from 'zlib'
 import { HtmlStore } from '~/models/inputForm'
+import { User, UserConnect } from '~/models/user'
 import { UserSessionCtxt } from '~/routes/layout'
 
 export const AVATAR_API = 'https://ui-avatars.com/api'
@@ -15,20 +16,19 @@ export const AUTH_TOKEN = 'authToken'
 export const BEARER = 'Bearer'
 
 export interface UserInfo {
-   jwt?: string
-   user: User
+   user: UserConnect
 }
 
-export interface User {
-   id: number
-   username: string
-   email: string
-   provider?: string
-   confirmed?: boolean
-   blocked?: boolean
-   createdAt?: string
-   updatedAt?: string
-}
+// export interface User {
+//    id: number
+//    username: string
+//    email: string
+//    provider?: string
+//    confirmed?: boolean
+//    blocked?: boolean
+//    createdAt?: string
+//    updatedAt?: string
+// }
 
 export const getToken = () => {
    if (typeof localStorage !== 'undefined') {
@@ -181,15 +181,52 @@ export const validateForm = (
 export function useStoreUser() {
    const userCtxt = useContext(UserSessionCtxt)
 
-   const setUserInfos = $((values: UserInfo) => {
+   const setUserInfos = $((values: any) => {
       if (values) {
-         userCtxt.user = values.user
-         return userCtxt.user
+         console.log('values', values)
+         userCtxt.connect = {
+            infos: {
+               username: values.username,
+               email: values.email,
+               nom: values.nom,
+               birthday: values.birthday,
+               ville: values.ville,
+               phone: values.phone || 0,
+               password: '', // Vous devrez peut-être récupérer le mot de passe à partir de votre API
+            },
+            provider: values.provider,
+            confirmed: values.confirmed,
+            blocked: values.blocked,
+            createdAt: values.createdAt,
+            updatedAt: values.updatedAt,
+         }
+         userCtxt.login = {
+            identifier: values.username,
+            password: values.password,
+         }
+         // jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjkzMDQ4OTc1LCJleHAiOjE2OTU2NDA5NzV9.mq7LM2AgDv7MhB6TDNYHQcdisf1IiLZcZouqm1O5hcI'
+         // birthday: null
+         // blocked: false
+         // confirmed: true
+         // createdAt: '2023-07-17T05:39:37.190Z'
+         // email: 'yser.tattoo@gmail.com'
+         // id: 1
+         // phone: null
+         // prenom: null
+         // provider: 'local'
+         // updatedAt: '2023-07-23T18:30:34.198Z'
+         // username: 'yser'
+         // ville: null
+         // userCtxt.connect!.blocked = values.connect!.blocked!
+         console.log('userCtxt.connect', userCtxt.connect)
+
+         // userCtxt.login = values.login
+         return userCtxt
       }
    })
 
    const getUserInfos = $(() => {
-      return { ...userCtxt.user }
+      return { ...userCtxt }
    })
    return {
       setUserInfos,

@@ -24,6 +24,36 @@ export const getReservations = async () => {
       throw error
    }
 }
+//localhost:1337/api/users/me?populate=*
+
+export const getUserReservations = async () => {
+   const token = getToken()
+   console.log('token resa', token)
+
+   try {
+      const response = await fetch(
+         'http://localhost:1337/api/users/me?populate=reservations',
+         {
+            method: 'GET',
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${token}`,
+            },
+         }
+      )
+
+      if (!response.ok) {
+         throw new Error('Method Not Allowed')
+      }
+      const data = await response.json()
+      console.log('data', data)
+
+      return data.reservations as Reservation[]
+   } catch (error) {
+      console.error('Error:', error)
+      throw error
+   }
+}
 export const postReservation = async (reservation: Reservation) => {
    console.log('reservation', reservation)
 

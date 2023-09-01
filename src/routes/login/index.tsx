@@ -8,11 +8,10 @@ import Header from '~/components/header/header'
 export default component$(() => {
    return (
       <div
-         style={`height: calc(100vh - 53px);
+         style={`height: calc(100vh - 50px);
     display: flex;
     flex-direction: column;`}
       >
-         <Header></Header>
          <Account></Account>
       </div>
    )

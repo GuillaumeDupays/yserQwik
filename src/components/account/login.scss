@@ -8,23 +8,22 @@
    border-radius: 5px;
    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
    margin: auto;
+
+   @include media-query(smartphone) {
+      width: 80%;
+   }
+   @include media-query(tablet) {
+      width: 60%;
+   }
+   @include media-query(desktop) {
+      width: 30%;
+   }
 }
 form {
    display: flex;
    flex-direction: column;
-
-   width: 300px;
+   width: auto;
    justify-content: space-between;
-   @include media-query(smartphone) {
-      width: 300px;
-   }
-   @include media-query(tablet) {
-      width: 400px;
-   }
-
-   @include media-query(desktop) {
-      width: 450px;
-   }
 }
 .container-footer {
    // border: 2px solid blue;
@@ -50,4 +49,36 @@ input:focus {
    button {
       width: 45%;
    }
+}
+
+section {
+   display: flex;
+   flex-direction: column;
+   p {
+      display: flex;
+      @include media-query(smartphone) {
+         margin: 3% 0 0 0;
+      }
+      @include media-query(desktop) {
+         margin: 5% 0 0 0;
+      }
+      @include media-query(tablet) {
+         margin: 2% 0 0 0;
+      }
+      label {
+         @include media-query(smartphone) {
+            // width: 300px;
+         }
+         width: 40%;
+         font-weight: 600;
+      }
+      span {
+         flex-grow: 1;
+      }
+   }
+}
+
+.forgot-pwd {
+   text-align: center;
+   padding: 0;
 }

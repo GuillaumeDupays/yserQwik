@@ -1,49 +1,42 @@
-import {
-   component$,
-   useContext,
-   useSignal,
-   useStore,
-   useStylesScoped$,
-   $,
-} from '@builder.io/qwik'
-import { Link } from '@builder.io/qwik-city'
-import styleHeader from '../header/header.scss?inline'
-import { UserSessionCtxt } from '~/routes/layout'
+import { component$, $, useSignal, useTask$ } from '@builder.io/qwik'
+import { useNavigate, useLocation, Link } from '@builder.io/qwik-city'
+
 export default component$(() => {
-   useStylesScoped$(styleHeader)
-   const userCtxt = useContext(UserSessionCtxt)
-   console.log('userCtxt', userCtxt)
-   const useUserStatus = useStore({
-      isConnected: '',
-      isNotConnected: "Se connecter/s'inscrire",
+   const isMenuOpen = useSignal(false) // État pour gérer l'ouverture/fermeture du menu
+   const navigate = useNavigate()
+   const location = useLocation()
+
+   const toggleMenu = $(() => {
+      isMenuOpen.value = !isMenuOpen.value
    })
-   const userConnected = $(() => {
-      const isConnected = !userCtxt.user.blocked
-      if (isConnected) {
-         return (useUserStatus.isConnected = `Bonjour ${userCtxt.user.username}`)
-      } else {
-         return useUserStatus.isNotConnected
-      }
-   })
+
    return (
       <>
-         <header>
-            <ul class={'animated-link '}>
-               <Link href="/projets" style={'text-decoration: none'}>
-                  PROJETS
-               </Link>
-            </ul>
-            <ul class={'animated-link '}>
-               <Link href="/reservation" style={'text-decoration: none'}>
-                  Réserver un créneau
-               </Link>
-            </ul>
-            <ul class={'animated-link '}>
-               <Link href="/login" style={'text-decoration: none'}>
-                  {userConnected()}
-               </Link>
-            </ul>
-         </header>
+         {/* Bouton pour ouvrir/fermer le menu */}
+         <button onClick$={toggleMenu} class="burger-button">
+            OPENB
+         </button>
+
+         {/* Utilisation du composant conditionnellement pour afficher le menu */}
+         {isMenuOpen.value && (
+            <>
+               <ul>
+                  <Link style={'text-decoration: none'} href="/reservation">
+                     Réserver un créneau
+                  </Link>
+               </ul>
+               <ul>
+                  <Link style={'text-decoration: none'} href="/projets">
+                     Projets disponibles
+                  </Link>
+               </ul>
+               <ul>
+                  <Link href="/login" style={'text-decoration: none'}>
+                     {/* {userConnected()} */}Login
+                  </Link>
+               </ul>
+            </>
+         )}
       </>
    )
 })

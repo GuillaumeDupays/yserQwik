@@ -37,15 +37,16 @@ body {
    padding: 0;
    line-height: inherit;
    margin: 0;
+   height: calc(100vh - 50px);
    @include media-query(smartphone) {
       font-size: smaller;
    }
    @include media-query(tablet) {
-      font-size: large;
+      font-size: medium;
    }
 
    @include media-query(desktop) {
-      font-size: large;
+      font-size: medium;
    }
 }
 

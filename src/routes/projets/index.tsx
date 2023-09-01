@@ -15,7 +15,7 @@ import Star from '~/components/star/star'
 import Header from '~/components/header/header'
 
 const token =
-   'EAArZBObBAW7gBOZBYncYCVgu5KYZAKiEH5OfXg6c7h5R9sCBgDvHt7pZBaduXZCF4pO64nPBrreW1ysZBjTnlZB63LHIMZBWO2Uo12NJzIZCtUkajworNhOf9xSKZA8SISKZBLKwXwk4htZB5CG0cnoXGaXnN57dcv7utgXoY0BJcy9MWrYOYeLV7REmdayvsZBN7bbUwZBIPjcagEzTrNzguPYp0kqHZBqST0mZBQvp9ZCodCZCoVZBP0ZBZBSZBF86cB4FHu0QMFsZCG2ej8nYRoZD'
+   'EAArZBObBAW7gBOZBcx78dJ4QpBxRi9U8wO9ZAVdGkuSqkiaKrpjHhvAGYv0Cl6rzeKmo6Iz6wTislNSEuyFywJRZA8qHBxtIwXXT9H7ZB9xUn0yMnT8zvCO3bCZCboARZCAsZAmbKOIKZAKkAkCxzoMvare2UJ7JqSAAfWttBoFisrA7nZCUVhAXMwb1GcrpjN6HnNr9pcmZAvGPVlC14ot4LUHtdEfDBxpBlWbJ1JWcJZCZBOMm6lhtqmtGF1fYNlDJjJqUar2pUowZDZD'
 export const instaApi = routeLoader$(async () => {
    const url =
       'https://graph.facebook.com/me/feed?fields=object_id,permalink_url,full_picture,message'
@@ -103,7 +103,6 @@ export default component$(() => {
 
    return (
       <>
-         <Header></Header>
          {/* <div class={'container-filtered-btns'}>
                 {useToFiltered.value.map(
                     (btnStyle) =>

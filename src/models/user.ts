@@ -1,12 +1,24 @@
 export interface User {
-   login?: UserLogin
-   register: UserRegister
+   login?: Login
+   register?: UserRegister
+   connect?: UserConnect
 }
 
-export interface UserLogin {
+export interface Login {
    id?: number
-   identifier: string
-   password: string
+   identifier?: string
+   password?: string
+   code?: string
+   email?: string
+}
+
+export type UserConnect = {
+   provider?: string
+   confirmed: boolean
+   blocked: boolean
+   createdAt?: string
+   updatedAt?: string
+   infos: UserRegister
 }
 
 export type UserRegister = {
