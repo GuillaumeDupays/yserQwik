@@ -1,102 +1,167 @@
 import {
    component$,
-   useStore,
-   useStylesScoped$,
    useVisibleTask$,
+   useStylesScoped$,
    $,
+   useStore,
+   useSignal,
+   useTask$,
 } from '@builder.io/qwik'
-import loaderStyle from './loader-accueil.scss?inline'
+
+import animeStyle from './animeAccueil.scss?inline'
+import { useNavigate } from '@builder.io/qwik-city'
 
 export default component$(() => {
-   useStylesScoped$(loaderStyle)
+   useStylesScoped$(animeStyle)
+
    const storeLine = useStore({
-      x1: 0,
-      y2: 0,
-      y1: 0,
-      x2: 0,
+      start: {
+         x: 0,
+         y: 0,
+      },
+      end: {
+         x: 0,
+         y: 0,
+      },
    })
-   interface Coordinates {
-      x: number
-      y: number
+
+   type Planet = {
+      planetId: string
+      orbitRadius: number // Distance par rapport au soleil
+      rotationSpeed: number // Vitesse de rotation autour du soleil
+      cx: number
+      cy: number
+      r: number
    }
 
+   const storePlanets = useStore<Planet[]>([
+      {
+         planetId: 'mercury',
+         orbitRadius: 60,
+         rotationSpeed: 0.02,
+         cx: 150,
+         cy: 150,
+         r: 2,
+      },
+      {
+         planetId: 'venus',
+         orbitRadius: 90,
+         rotationSpeed: 0.015,
+         cx: 150,
+         cy: 150,
+         r: 3,
+      },
+      {
+         planetId: 'earth',
+         orbitRadius: 120,
+         rotationSpeed: 0.01,
+         cx: 150,
+         cy: 150,
+         r: 4,
+      },
+      {
+         planetId: 'mars',
+         orbitRadius: 160,
+         rotationSpeed: 0.008,
+         cx: 150,
+         cy: 150,
+         r: 3.5,
+      },
+      // Ajoutez d'autres planètes ici
+   ])
+
+   const useStopAnimation = useSignal(false)
+   const rotationAngle = useSignal(0)
+   const nav = useNavigate()
+
+   const updatePlanetPos = $((planet: Planet) => {
+      if (planet && !useStopAnimation.value) {
+         const centerX = 150
+         const centerY = 150
+         const planetX =
+            centerX + planet.orbitRadius * Math.cos(rotationAngle.value)
+         const planetY =
+            centerY + planet.orbitRadius * Math.sin(rotationAngle.value)
+
+         storeLine.start.x = 150 // Position du soleil (centre)
+         storeLine.start.y = 150 // Position du soleil (centre)
+         storeLine.end.x = planetX
+         storeLine.end.y = planetY
+         planet.cx = planetX
+         planet.cy = planetY
+
+         rotationAngle.value += planet.rotationSpeed
+
+         requestAnimationFrame(() => updatePlanetPos(planet))
+      }
+   })
+
+   const toggleAnimation = $(() => {
+      useStopAnimation.value = !useStopAnimation.value
+
+      if (!useStopAnimation.value) {
+         storePlanets.forEach((planet) => {
+            updatePlanetPos(planet)
+         })
+      }
+   })
+
    useVisibleTask$(() => {
-      const planet1 = document.getElementById('planet1')
-      const connectingLine = document.getElementById('connectingLine')
+      console.log('store planete', storePlanets)
 
-      if (planet1 && connectingLine) {
-         const animateLine = () => {
-            const planet1BoundingBox = planet1.getBoundingClientRect()
-            const svgBoundingBox = connectingLine!
-               .closest('svg')!
-               .getBoundingClientRect()
-
-            const planet1X = planet1BoundingBox.x + planet1BoundingBox.width / 2
-
-            const planet1Y =
-               planet1BoundingBox.y + planet1BoundingBox.height / 2
-
-            connectingLine.setAttribute(
-               'x2',
-               (planet1X - svgBoundingBox.x).toString()
-            )
-            connectingLine.setAttribute(
-               'y2',
-               (planet1Y - svgBoundingBox.y).toString()
-            )
-
-            requestAnimationFrame(animateLine)
-         }
-
-         animateLine()
+      if (!useStopAnimation.value) {
+         storePlanets.forEach((planet) => {
+            updatePlanetPos(planet)
+         })
       }
    })
 
    return (
       <div class="container">
-         {/* <input type="text" placeholder="Champ texte" /> */}
-
-         <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="300"
-            height="300"
-            viewBox="0 0 800 800"
-         >
-            {/* x1 : Coordonnée x du point de départ de la ligne.
-         y1 : Coordonnée y du point de départ de la ligne.
-         x2 : Coordonnée x du point d'arrivée de la ligne.
-         y2 : Coordonnée y du point d'arrivée de la ligne. */}
-
-            <circle class="sun" cx="400" cy="400" r="50" />
-            <circle
-               id="planet1"
-               class="planet planet1"
-               cx="550"
-               cy="400"
-               r="7"
-            />
+         <button onClick$={() => toggleAnimation()}>
+            {useStopAnimation.value ? 'Démarrer' : 'Arrêter'}
+         </button>
+         <svg width="300" height="300">
+            <circle cx="150" cy="150" r="5" fill="yellow" /> {/* Soleil */}
             <line
-               id="connectingLine"
-               x1="0"
-               y1="0"
-               x2="0"
-               y2="0"
-               stroke="blue"
-               stroke-width="2"
+               x1={storeLine.start.x}
+               y1={storeLine.start.y}
+               x2={storeLine.end.x}
+               y2={storeLine.end.y}
+               stroke="black"
+               stroke-width="1"
             />
-
-            <circle class="planet planet2" cx="480" cy="400" r="5" />
-            <circle class="planet planet3" cx="600" cy="400" r="3" />
-            <circle class="planet planet4" cx="520" cy="400" r="2" />
-            <g class="stars">
-               <circle cx="0" cy="100" r="4" />
-               <circle cx="200" cy="300" r="1" />
-               <circle cx="600" cy="150" r="1" />
-               <circle cx="100" cy="100" r="3" />
-               <circle cx="200" cy="300" r="1" />
-               <circle cx="600" cy="150" r="2" />
-               {/* <!-- Ajoutez plus d'étoiles ici --> */}
-            </g>
+            {storePlanets.map(({ planetId, cx, cy, r }) => (
+               <circle
+                  key={planetId}
+                  id={planetId}
+                  class="planet"
+                  cx={cx}
+                  cy={cy}
+                  r={r}
+               />
+            ))}
+            <rect
+               x={storeLine.start.x - 30}
+               y={storeLine.start.y - 20}
+               rx="10"
+               ry="10"
+               width="60"
+               height="40"
+               fill="blue"
+            />
+            <text
+               id="text"
+               class="text"
+               x={storeLine.start.x}
+               y={storeLine.start.y}
+               fill="white"
+               text-anchor="middle"
+               alignment-baseline="middle"
+               onClick$={() => nav('/login')}
+            >
+               Accueil
+            </text>
          </svg>
       </div>
    )
